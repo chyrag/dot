@@ -1,0 +1,66 @@
+# zsh functions
+
+function precmd {
+        #PROMPT="%m/$RED$(date +%T)$GREEN$(echo $TERM | cut -c1)$NORMAL/%l:%~%# "
+	if [ $SB ]; then
+		P=`echo $PWD  | sed "s,$SB,,"`
+        	PROMPT="%m/$TERM/%l:$SB_NAME$P%# "
+	else
+		PROMPT="%m/$TERM/%l:%~%# "
+	fi
+	#CURLOAD=`uptime | cut -d: -f4 | cut -d, -f1`
+	CURLOAD=`uptime | sed 's/^.*load averages://'  | cut -d, -f1`
+	RPROMPT=" %t ($CURLOAD)"
+}
+
+function preexec {
+	if [ $SB_NAME ]; then
+		echo -ne "\ek${SB_NAME}:${1%% *}\e\\"
+	else
+		echo -ne "\ek${1%% *}\e\\"
+	fi
+}
+
+function cd {
+	if [ $# = 0 ]; then
+		pushd $HOME > /dev/null
+		return
+	fi
+
+	if [ $1 = "-" ]; then
+		builtin popd > /dev/null
+	else
+		builtin pushd $1 > /dev/null
+	fi
+}
+
+function rehash-workdirs {
+# prepare list of sandboxes to prompt with workon
+	WORKDIRS=( `find $SB_BASE_PATH -name src -maxdepth 2 | sed "s,$SB_BASE_PATH/,,;s,/src,,"` )
+	compctl -k "( $WORKDIRS )" workon
+
+	# if there are certain directories with src directory (eg, freebsd6 srcs), then
+	# use the following
+	#if [ -f $SB_BASE_PATH/.list ]; then
+		##WORKDIRS=( `cd $SB_BASE_PATH; ls -1 | grep -vf .list` )
+	#fi
+}
+
+function setup_ssh {
+	if [ -z "$SSH_AUTH_SOCK" ]; then
+		TMPFILE=$TMPDIR/.chirag.ssh_setup.$$
+		ssh-agent > $TMPFILE
+		source $TMPFILE
+		rm $TMPFILE
+	fi
+
+	if [ -n "$SSH_AGENT_PID" ]; then
+		echo ""
+		echo ""
+		echo "Setup your SSH Keys now ..."
+		echo ""
+		ssh-add
+		echo ""
+		echo ""
+	fi
+}

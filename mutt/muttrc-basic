@@ -1,0 +1,5 @@
+set hostname="juniper.net"
+set spoolfile="imaps://chirag@imap-bng.jnpr.net"
+set folder="imaps://chirag@imap-bng.jnpr.net"
+set record=+"Sent Items"
+set postponed=+Drafts

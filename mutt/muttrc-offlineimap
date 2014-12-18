@@ -1,0 +1,12 @@
+#source ~/path-to-mbnames-muttrc-mailboxes
+set mbox_type=Maildir
+set folder=/volume/bng-nfsbuild1/chirag/Maildir
+set spoolfile=+INBOX
+set preconnect="~/bin/imapfilter; /usr/local/bin/python ~/work/jlto/offlineimap/current/offlineimap.py -u Noninteractive.Basic"
+source "~/.muttrc-common"
+
+#set mbox=+Received-`date +%Y-%m`
+#set record=+Sent-`date +%Y-%m`
+set mbox=+mbox
+set record=+"Sent Items"
+set postponed=+Drafts

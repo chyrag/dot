@@ -1,0 +1,10 @@
+#!/bin/sh
+
+_screen_list()
+{
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    screens=$(screen -ls | grep -E "Detached|Attached" | cut -d. -f2 | sed 's,(Detached),,;s,(Attached),,')
+    COMPREPLY=( $(compgen -W "$screens" -- $cur) )
+}
+complete -F _screen_list Screen
+

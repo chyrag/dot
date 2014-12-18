@@ -1,0 +1,10 @@
+Host *
+	AddressFamily inet
+	Compression yes
+	EscapeChar none
+	ForwardAgent yes
+	ForwardX11 yes
+	ForwardX11Trusted yes
+	ServerAliveCountMax 10
+	ServerAliveInterval 60
+	StrictHostKeyChecking no

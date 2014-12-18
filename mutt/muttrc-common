@@ -1,0 +1,81 @@
+my_hdr From: Chirag Kantharia <chirag@juniper.net>
+my_hdr Organization: Juniper Networks
+my_hdr Reply-To: Chirag Kantharia <chirag@juniper.net>
+
+set hostname="juniper.net"
+set realname="Chirag Kantharia"
+#set nouse_domain                # don't qualify local addresses with $domain
+set use_domain          # don't qualify local addresses with $domain
+set query_command = "~/bin/mutt-ldap.pl '%s'"
+set print_command='a2ps --medium=A4 -s 2 -P daya'
+
+set alias_file=~/.mutt/aliases
+set mbox=+Archives/Received-`date +%Y-%m`
+set record=+Archives/Sent-`date +%Y-%m`
+set postponed=+Drafts
+
+# common settings
+set editor="vim -X +/^$/+1"		# editor to use when composing messages
+set fast_reply			# skip initial prompts when replying
+set hdrs			# include `my_hdr' lines in outgoing messages
+#set edit_hdrs
+set include			# always include messages when replying
+set indent_string="| "		# how to quote replied text
+set forward_format="[Fwd] %s"   # subject to use when forwarding messages
+#set move=yes			# don't ask about moving messages, just do it
+set move=no
+set delete=yes
+set noconfirmappend
+set pager_index_lines=6		# how many index lines to show in the pager
+set noprompt_after	# ask me for a command after the external pager exits
+set reply_to			# always use reply-to if present
+set reverse_name		# use my address as it appears in the message
+				# i am replying to
+set nosave_empty		# remove files when no messages are left
+set sort=threads		# primary sorting method
+set sort_browser=reverse-date	# how to sort files in the dir browser
+#set nouse_domain		# don't qualify local addresses with $domain
+#set print_command='a2ps -s 2 -P daya'
+unset mark_old
+unset reply_self # Dont include self in reply
+
+ignore *		# this means "ignore all lines by default"
+unignore	from: subject to cc mail-followup-to \
+		date x-mailer x-url # this shows how nicely wrap long lines
+
+# use mailcap defined rules for viewing text/html mails
+#auto_view text/calendar 
+auto_view text/html 
+alternative_order text/plain text/html
+
+color normal            black           black
+color hdrdefault        green           black
+color signature         red             black
+color indicator         black           yellow
+color quoted            yellow          black
+color quoted1           white           black
+color error             brightred       black
+color status            yellow          blue
+color tree              magenta         black      # the thread tree in the index menu
+color tilde             magenta         black
+color message           brightcyan      black
+color markers           brightcyan      black
+color attachment        brightmagenta   black
+color search            black         green      # how to hilite search patterns in the pager
+color body              magenta         black "(ftp|http)://[^ ]+" # point out URLs
+color body              magenta         black [-a-z_0-9.]+@[-a-z_0-9.]+    # e-mail addresses
+color underline         brightgreen     black
+
+bind index q sync-mailbox # don't quit just as yet
+bind pager y previous-line	# just like vi and less
+bind pager B previous-page	# just like vi and less
+bind pager G bottom	# just like vi and less
+bind pager ^D flag-message
+
+#folder-hook . 'macro index d "<save-message>=Deleted Items/<enter>"'
+#folder-hook "=Deleted Items" 'macro index d <delete-message>'
+
+source "~/.mailboxes"
+source "~/.mutt/aliases"
+
+# EOF

@@ -1,0 +1,11 @@
+#alias ls='/bin/ls -qF --color $*'
+#alias sl='/bin/ls -qF --color $*'
+alias ls='/bin/ls -qFG $*'
+alias sl='/bin/ls -qFG $*'
+alias telnet='telnet -K'
+alias vi='vim -X'
+alias m='mailstat -t $HOME/mail/log'
+#alias msync='/usr/local/bin/python ~/work/jlto/offlineimap/current/offlineimap.py'
+alias msync='python ~/work/jlto/imap/offlineimap/current/offlineimap.py'
+
+alias sls='screen -ls'

@@ -1,0 +1,21 @@
+# Sample minimal config file.  Copy this to ~/.offlineimaprc and edit to
+# suit to get started fast.
+
+[general]
+accounts = JNPR
+
+[Account JNPR]
+localrepository = Local
+remoterepository = Remote
+presynchook = imapfilter
+
+[Repository Local]
+type = Maildir
+localfolders = /volume/bng-nfsbuild1/chirag/Maildir
+
+[Repository Remote]
+type = IMAP
+remotehost = pod51010.outlook.com
+ssl = yes
+remoteuser = chirag
+remotepass = Wos4NOCI

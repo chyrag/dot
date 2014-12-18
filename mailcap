@@ -1,0 +1,23 @@
+image/png;  /usr/local/bin/xloadimage -zoom 150 '%s'; description=PNG Image; test=test -n "$DISPLAY";  nametemplate=%s.png
+image/gif;  /usr/local/bin/xloadimage -zoom 150 '%s'; description=GIF Image; test=test -n "$DISPLAY";  nametemplate=%s.gif
+image/jpeg;  /usr/local/bin/xloadimage -zoom 150 '%s'; description=JPEG Image; test=test -n "$DISPLAY";  nametemplate=%s.jpeg
+image/pjpeg;  /usr/local/bin/xloadimage -zoom 150 '%s'; description=JPEG Image; test=test -n "$DISPLAY";  nametemplate=%s.jpeg
+#image/png;  /usr/X11R6/bin/xv -expand 1.5 '%s'; description=PNG Image; test=test -n "$DISPLAY";  nametemplate=%s.png
+#image/jpeg;  /usr/X11R6/bin/xv -expand 1.5 '%s'; description=JPEG Image; test=test -n "$DISPLAY";  nametemplate=%s.jpeg
+#image/pjpeg;  /usr/X11R6/bin/xv -expand 1.5 '%s'; description=JPEG Image; test=test -n "$DISPLAY";  nametemplate=%s.jpeg
+#image/gif;  /usr/X11R6/bin/xv -expand 1.5 '%s'; description=GIF Image; test=test -n "$DISPLAY";  nametemplate=%s.gif
+application/vnd.ms-excel; catdoc '%s'
+application/msword; catdoc '%s' | less
+application/pdf; xpdf '%s'
+text/html; elinks -dump 0 -force-html '%s'; copiousoutput;
+text/calendar; ~/bin/meeting.pl; copiousoutput; 
+
+##this is used when (v)iewing a text/html attachment:
+##allowing you to browse and "click" links
+##order matters the first entry which passes the test is used
+#gui browser if $DISPLAY is set
+text/html; mozilla %s; test=test -n "$DISPLAY"; nametemplate=%s.html
+#text browser otherwise
+text/html; w3m -v -F -T text/html %s; nametemplate=%s.html; needsterminal
+##auto_view will use the entry with the copiousoutput part:
+text/html; lynx -stdin -dump -force_html ; copiousoutput

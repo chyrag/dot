@@ -1,0 +1,8 @@
+set spoolfile="imaps://imap-bng/"
+set folder="imaps://imap-bng/"
+set ssl_starttls=yes
+set imap_user="chirag"
+set imap_pass="Ian!Jura"
+set certificate_file=~/.mutt/certificates
+set edit_hdrs
+source "~/.muttrc-common"

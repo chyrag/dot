@@ -1,0 +1,11 @@
+startup_message off
+#idle 600 lockscreen
+defscrollback 4096
+escape ^Oo
+bind 'K' kill
+vbell on
+shelltitle .
+hardstatus string " %w"
+caption always "%{.bW}%-Lw%{.rW}%n %t%{-}%+Lw %=%{..G} %H %{..Y} %m/%d %D %0c"
+#bindkey "[C" focus up
+#bindkey "[D" focus down

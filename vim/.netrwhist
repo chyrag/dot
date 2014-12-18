@@ -1,0 +1,8 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =6
+let g:netrw_dirhist_1='/b/chirag/DEV_CD_RT2_53_BRANCH/src/pfe/obj-fxpc-brcm-i386-tvp'
+let g:netrw_dirhist_2='/b/chirag/DEV_CD_RT2_53_BRANCH/src/dist/lighttpd/src'
+let g:netrw_dirhist_3='/volume/bng-nfsbuild1/chirag/rli/tvp/build'
+let g:netrw_dirhist_4='/volume/bng-nfsbuild1/chirag/rli/tvp/apigw/ndcpfe/serializer'
+let g:netrw_dirhist_5='/b/chirag/DEV_S3_DCAPI_LINUX_BRANCH/junos/src'
+let g:netrw_dirhist_6='/b/chirag/DEV_S3_DCAPI_LINUX_BRANCH/junos/src/dcclient/serializer'

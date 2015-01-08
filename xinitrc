@@ -14,6 +14,12 @@ xset dpms 360 600 900
 xsetroot -solid Black
 #nice -19 xplanet -origin sun -target earth -radius 70 -transparency -idlewait 120 -wait 900 -fork
 
+# dim the display
+xbacklight -set 10
+
+# battery
+xbattbar -c &
+
 # rsi
 #xwrits typetime=40 breaktime=5 +mouse +beep +breakclock & disown
 

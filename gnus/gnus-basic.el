@@ -1,6 +1,3 @@
-;; self details
-;; (setq user-full-name "Chirag Kantharia" user-mail-address "chirag@versa-networks.com"  organization "Versa Networks")
-
 ;; setup versa mail (gmail)
 (setq gnus-select-method
       '(nnimap "versa networks"
@@ -46,7 +43,6 @@
 			     (organization "Versa Networks")
 			     (signature-file "~/.signature")))
       gnus-summary-line-format "%1{%U%R%z: %}%2{%d%}%5{ %[%4i%] %}%4{%-24,24n%}%6{%-4,4ur%}%5{| %}%(%1{%B%}%s%)\n"
-;;      gnus-group-line-format "%P%M%S\t%(%G%) (%y)\n"
       gnus-group-mode-line-format "Gnus: %%b"
       gnus-group-line-format "%M%S%p%P%5y:%B%(%g%)%O\n"
 
@@ -84,7 +80,6 @@
 
 (set-face-foreground 'face-label "olive drab")
 (setq gnus-face-6 'face-label)
-
 
 (set-face-foreground 'gnus-summary-high-unread-face "dark red")
 (set-face-foreground 'gnus-summary-normal-unread-face "blue")

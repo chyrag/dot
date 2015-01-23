@@ -1,53 +1,48 @@
 ;;; -*-Emacs-Lisp-*-
 
 ;; General stuff ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ;; load elisp files from home directory as well.
 (setq load-path (cons (expand-file-name "~/.elisp/") load-path))
-
 (setq inhibit-startup-message t)
 (setq inhibit-startup-echo-area-message t)
-
+;; supress bright colors
+(tty-suppress-bold-inverse-default-colors t)
 ;; highlight matching brackets
 (show-paren-mode t)
-
-;; activate scrolling using mouse wheel
-(if (>= emacs-major-version 21)
-    (mouse-wheel-mode 't))
-
 ;; scroll one line at a time (instead of scrolling half a page)
 (setq scroll-step 1)
-
 ;; show the marked region
 (setq transient-mark-mode 't)
-
-;; show linuecolumn number in the modeline
+;; no audible bell
+(setq visible-bell t)
+;; stop at the end of the file, not just add lines
+(setq next-line-add-newlines nil)
+;; always end a file with a newline
+(setq require-final-newline t)
+;; show linecolumn number in the modeline
 (setq line-number-mode t)
 (setq column-number-mode t)
-
+;; we don't want the tool-bar/menu-bar/time
+(fset 'menu-bar-open nil)
+(menu-bar-mode -1)
+(global-font-lock-mode -1)
+(tool-bar-mode -1)
+(blink-cursor-mode -1)
+(scroll-bar-mode -1)
+(display-time-mode -1)
 ;; no backups
 (setq make-backup-files nil)
 (setq auto-save-interval 0)
 (setq auto-save-timeout 600)
+;; font lock mode
+(global-font-lock-mode t)
 
 ;; remap control-H to delete
 (progn
   (define-key ctl-x-map "?" 'help-command)
+
   (define-key global-map "\C-h" (lookup-key global-map "\C-?"))
   (setq help-char ??))
-
-;; we don't want the tool-bar/menu-bar
-(if (>= (string-to-number (substring emacs-version 0 2)) 20)
-    (progn
-      (menu-bar-mode -1)
-      (global-font-lock-mode -1)
-      (if (>= (string-to-number (substring emacs-version 0 2)) 21)
-          (progn
-            (tool-bar-mode -1)
-            (blink-cursor-mode -1)
-            ))
-      ))
-(scroll-bar-mode -1)
 
 ;; Meta
 (global-set-key "\M- " 'set-mark-command)
@@ -56,42 +51,6 @@
 (global-set-key "\M-r" 'replace-string)
 (global-set-key "\M-g" 'goto-line)
 (global-set-key "\M-h" 'help-command)
-
-;; Misc
-(global-set-key [C-tab] "\C-q\t")	; Control tab quotes a tab.
-(setq backup-by-copying-when-mismatch t)
-
-;; Treat 'y' or <CR> as yes, 'n' as no.
-(fset 'yes-or-no-p 'y-or-n-p)
-(define-key query-replace-map [return] 'act)
-(define-key query-replace-map [?\C-m] 'act)
-
-;; font lock mode
-;;(require 'my-font-lock)
-;;(global-font-lock-mode t)
-
-;; Misc...
-(transient-mark-mode 1)
-(setq mark-even-if-inactive t)
-(setq visible-bell t)
-(setq next-line-add-newlines nil)
-(setq compile-command "mk")
-(setq suggest-key-bindings nil)
-(put 'eval-expression 'disabled nil)
-(put 'narrow-to-region 'disabled nil)
-(put 'set-goal-column 'disabled nil)
-(if (>= emacs-major-version 21)
-    (setq show-trailing-whitespace t))
-
-;; always end a file with a newline
-(setq require-final-newline t)
-
-;; stop at the end of the file, not just add lines
-(setq next-line-add-newlines nil)
-
-(setq display-time-day-and-date t)
-(setq display-time-24hr-format t)
-(display-time)
 
 ;; Fraley's insert current date function
 ;; Thu 8/25, 15:43:46
@@ -119,13 +78,6 @@
 	 (year (substring date (match-beginning 5) (match-end 5))))
     (insert (concat weekday " " month "/" day ", " time))))
 
-;; SJG's ins-date
-;; 2005/08/25 15:47:19
-(autoload 'fdate-string "fdate" "formatted date/time")
-(defun ins-date ()
-  "Insert a date tag"
-  (interactive)
-  (fdate-string "%Y/%m/%d %H:%M:%S"))
 
 ;; Programming ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -186,40 +138,15 @@
   "Set the default c-style for Juniper."
   (interactive)
   (define-key c-mode-map "\r" 'newline-and-indent)
-  (c-set-style "juniper"))
+  (c-set-style "juniper")
+  (abbrev-mode nil)
+  (flyspell-mode))
 
 (add-hook 'c-mode-common-hook 'juniper-c-default-style)
-(setq auto-mode-alist
-      (append '(("\\.odl$"    . c-mode)
-		("\\.dd$"     . c-mode)
-		("\\.errmsg$" . c-mode))
-	      auto-mode-alist))
 
-;;; Emulate vi's ":set list" command.  Setting is buffer-local and
-;;; won't screw up the rest of the editor session.  This probably
-;;; should be a minor mode instead of two global functions.  Consider
-;;; using the whitespace.el or show-whitespace-mode.el packages.
-
-(defvar vi-list-display-table (make-display-table)
-  "vi-list display table for showing tabs and EOLs")
-(aset vi-list-display-table ?\t (vconcat "^I"))
-(aset vi-list-display-table ?\n (vconcat "$\n"))
-
-(defun vi-list ()
-  "Simulate a :set list in Vi."
-  (interactive)
-  (setq buffer-display-table vi-list-display-table))
-
-(defun vi-nolist ()
-  "Simulate a :set nolist in Vi."
-  (interactive)
-  (setq buffer-display-table nil))
-
-
-;;
-;;(defun my-c-initialization-hook ()
-;;(add-hook 'c-initialization-hook 'my-c-initialization-hook)
-;;
+;; waf
+(setq auto-mode-alist (cons '("wscript" . python-mode) auto-mode-alist))
+;; (setq compile-command 'waf)
 
 ;; idutils
 ;; (autoload 'gid "ID" nil t)
@@ -234,30 +161,6 @@
 	     (define-key c-mode-map "\C-cd" 'vc-diff)
 	     'juniper-c-default-style
 	     (abbrev-mode nil)
-	     ;; mode-line-format
-	     (setq default-mode-line-format
-		   (list "-"
-			 'mode-line-mule-info
-			 'mode-line-modified
-			 'mode-line-frame-identification
-			 ;; Note that this is evaluated while making the list.
-			 ;; It makes a mode line construct which is just a string.
-			 '(:eval (substring (getenv "HOST") 0 (string-match "\\..+" (system-name))))
-			 ":" 
-			 '(:eval (substring (eval 'buffer-file-name) (1+ (string-bytes (getenv "SB_BASE_PATH"))) ))
-			 '(which-func-mode ("" which-func-format "--"))
-			 " "
-			 'global-mode-string
-			 "   %[("
-			 '(:eval (mode-line-mode-name))
-			 'mode-line-process  
-			 'minor-mode-alist 
-			 "%n" 
-			 ")%]--"
-			 '(line-number-mode "%l,")
-			 '(column-number-mode "%c--")
-			 '(-3 . "%p")
-			 "-%-"))
 
 	     (defun toggle-tab-width ()
 	       "Toggle the value of tab-width between 4 and 8"
@@ -284,18 +187,44 @@
 	       (next-error (- n)))
 	     ))
 
-;; supress bright colors
-(tty-suppress-bold-inverse-default-colors t)
+;;; Emulate vi's ":set list" command.  Setting is buffer-local and
+;;; won't screw up the rest of the editor session.  This probably
+;;; should be a minor mode instead of two global functions.  Consider
+;;; using the whitespace.el or show-whitespace-mode.el packages.
 
-;; vm
-(add-to-list 'load-path (expand-file-name "~/.elisp/vm/lisp"))
-(add-to-list 'Info-default-directory-list (expand-file-name "~/.elisp/vm/info"))
-(require 'vm-autoloads)
+(defvar vi-list-display-table (make-display-table)
+  "vi-list display table for showing tabs and EOLs")
+(aset vi-list-display-table ?\t (vconcat "^I"))
+(aset vi-list-display-table ?\n (vconcat "$\n"))
 
-;; General _exit() stuff ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun vi-list ()
+  "Simulate a :set list in Vi."
+  (interactive)
+  (setq buffer-display-table vi-list-display-table))
 
-;; No need to debug anything now
-(setq debug-on-error nil)
+(defun vi-nolist ()
+  "Simulate a :set nolist in Vi."
+  (interactive)
+  (setq buffer-display-table nil))
 
-;; All done
-(message "All done, %s%s" (user-login-name) ".")
+;; cscope
+(require 'xcscope)
+(setq cscope-no-mouse-prompts t)
+(cscope-setup)
+
+;; bbdb
+(add-hook 'gnus-startup-hook 'bbdb-insinuate-gnus)
+
+;; diary
+
+;; printer
+;; need custom command to print directly
+;; a2ps -P HP_HP_LaserJet_400_MFP_M425dn -s duplex
+(setq ps-printer-name "HP_HP_LaserJet_400_MFP_M425dn"
+      ps-printer-name-option "-P"
+      ps-lpr-command "a2ps"
+      ps-spool-duplex t
+      ps-auto-font-detect nil
+      ps-print-color-p nil)
+
+;; eof

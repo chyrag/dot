@@ -16,7 +16,6 @@
  message-kill-buffer-on-exit t ;; kill buffer after sending mails
 )
 
-
 ;; headers/labels
 (defun rs-gnus-get-label (header)
   "Returns label from X-Label header"
@@ -48,7 +47,8 @@
 
       gnus-summary-thread-gathering-function 'gnus-gather-threads-by-references
       gnus-thread-sort-functions '(lambda (t1 t2) (not (gnus-thread-sort-by-date t1 t2)))
-      gnus-use-cache t)
+      gnus-use-cache t
+      gnus-use-full-window nil)
 
 ;; (add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
 

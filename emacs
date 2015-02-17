@@ -51,6 +51,11 @@
 (global-set-key "\M-r" 'replace-string)
 (global-set-key "\M-g" 'goto-line)
 (global-set-key "\M-h" 'help-command)
+(global-set-key (kbd "<C-up>") 'shrink-window)
+(global-set-key (kbd "<C-down>") 'enlarge-window)
+(global-set-key (kbd "<C-right>") 'shrink-window-horizontally)
+(global-set-key (kbd "<C-left>") 'enlarge-window-horizontally)
+
 
 ;; Fraley's insert current date function
 ;; Thu 8/25, 15:43:46
@@ -139,8 +144,8 @@
   (interactive)
   (define-key c-mode-map "\r" 'newline-and-indent)
   (c-set-style "juniper")
-  (abbrev-mode nil)
-  (flyspell-mode))
+;;  (flyspell-mode)
+  (abbrev-mode nil))
 
 (add-hook 'c-mode-common-hook 'juniper-c-default-style)
 
@@ -153,7 +158,10 @@
 
 ;; cscope
 (require 'xcscope)
+(cscope-setup)
 (setq cscope-no-mouse-prompts t)
+(setq cscope-do-not-update-database t)
+(setq cscope-close-window-after-select t)
 
 (add-hook 'c-mode-hook
 	  '(lambda ()

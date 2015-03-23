@@ -9,12 +9,21 @@
 	       (nnimap-inbox "Inbox")
 	       (nnimap-stream ssl)))
 
+;;(setq nnmail-expiry-target 'nnmail-fancy-expiry-target
+;;      nnmail-fancy-expiry-targets
+;;      '((to-from 'user-mail-address "nnimap+gmail:tome")
+;; (".*" "nnimap+gmail:attic"))
+;;     nnmail-expiry-wait 2)
+
 ;; misc reading/composing settings
 (setq 
  mm-text-html-renderer 'w3m    ;; use w3m to view html mail
  message-fill-column 72        ;; wrap text at column 72
  message-kill-buffer-on-exit t ;; kill buffer after sending mails
-)
+ message-mode-hook (quote (flyspell-mode)) ;; spell check my mails
+ message-citation-line-function 'message-insert-formatted-citation-line ;; citation line
+ message-citation-line-format "On %a, %b %d %Y at %r, %f wrote:"
+ message-send-mail-function 'smtpmail-send-it)
 
 ;; headers/labels
 (defun rs-gnus-get-label (header)
@@ -25,7 +34,7 @@
 (defalias 'gnus-user-format-function-r 'rs-gnus-get-label)
 
 ;; gnus variables
-(setq gnus-permanently-visible-groups "^INBOX\\|^\\[Gmail\\]\\/Drafts\\|^\\[Gmail\\]\\/Sent\\ Mail\\|^attic\\|^build\\|^bugs\\|^versa-sw-blr\\|^versa-blr\\|^git-admin" ;; select groups that we want to see all the time
+(setq gnus-permanently-visible-groups "^INBOX\\|^\\[Gmail\\]\\/All\\ Mail\\|^\\[Gmail\\]\\/Drafts\\|^\\[Gmail\\]\\/Sent\\ Mail\\|^tome\\|^attic\\|^build\\|^bugs\\|^versa-sw-blr\\|^versa-blr\\|^git-admin" ;; select groups that we want to see all the time
       gnus-visible-headers
       '("From:" "^Newsgroups:" "^Subject:" "^Date:" "^Followup-To:" "^Reply-To:"
 	"^Organization:" "^Summary:" "^Keywords:" "^To:" "^Cc:" "^Posted-To:"
@@ -48,13 +57,13 @@
       gnus-summary-thread-gathering-function 'gnus-gather-threads-by-references
       gnus-thread-sort-functions '(lambda (t1 t2) (not (gnus-thread-sort-by-date t1 t2)))
       gnus-use-cache t
+      gnus-large-newsgroup nil
       gnus-use-full-window nil)
 
 ;; (add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
 
-;; send mail settings			     
-(setq message-send-mail-function 'smtpmail-send-it
-      smtpmail-smtp-server "localhost"
+;; smtp mail settings (nullmailer)
+(setq smtpmail-smtp-server "localhost"
       smtpmail-smtp-service 10025)
 
 ;; fontify
@@ -126,5 +135,17 @@
 ;; mairix
 (require 'mairix)
 ;; tbd
+
+;; google calendar
+(require 'google-calendar)
+
+;; mhc
+;; (when (locate-library "mhc")
+;;  (if (fboundp 'mhc-select-mailer-package)
+;;      (mhc-select-mailer-package 'gnus)) ;; 'mew, 'gnus, 'wl or 'cmail
+;;  (setq mhc-insert-overdue-todo t)
+;;  (setq mhc-use-wide-scope 14)
+;;  (setq mhc-file-line-status-strings '(" Mhc" . " MHC"))
+;;  )
 
 ;; eof

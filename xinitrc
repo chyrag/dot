@@ -2,6 +2,9 @@
 
 PATH=/usr/local/bin:$PATH
 
+# figure out if we have multi-monitor setup
+$HOME/bin/reset-display
+
 # grab my X-settings
 xrdb .Xdefaults
 
@@ -28,8 +31,8 @@ xbattbar -c &
 
 # dwm status bar
 while true; do
-   xsetroot -name "$( date +"%a %d %b %Y %H:%M" )"
-   sleep 60    # Update time every minute
+    xsetroot -name "$( dwm_status.py )"
+    sleep 10
 done &
 
 # start window manager with ssh-agent

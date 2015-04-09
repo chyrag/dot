@@ -20,6 +20,10 @@ xsetroot -solid Black
 # dim the display
 xbacklight -set 10
 
+VERSA_BLR_LON=12.970699
+VERSA_BLR_LAT=77.598376
+redshift -l $VERSA_BLR_LAT:$VERSA_BLR_LON &
+
 # battery
 xbattbar -c &
 

@@ -2,20 +2,36 @@
 # suit to get started fast.
 
 [general]
-accounts = JNPR
+accounts = jnpr, versa
 
-[Account JNPR]
+[Account versa]
 localrepository = Local
-remoterepository = Remote
+remoterepository = VersaRemote
+autorefresh = 1
+#presynchook = ~/bin/sync_nnmaildir -g
+#postsynchook = ~/bin/sync_nnmaildir -m
+
+[Account jnpr]
+localrepository = Local
+remoterepository = JnprRemote
 presynchook = imapfilter
 
 [Repository Local]
 type = Maildir
-localfolders = /volume/bng-nfsbuild1/chirag/Maildir
+localfolders = ~/Maildir
 
-[Repository Remote]
+[Repository JnprRemote]
 type = IMAP
 remotehost = pod51010.outlook.com
 ssl = yes
 remoteuser = chirag
-remotepass = Wos4NOCI
+remotepass = xxxxxxx
+
+[Repository Remote]
+type = Gmail
+remoteuser = chirag@versa-networks.com
+remotepass = xxxxxxxxxx
+holdconnectionopen = true
+keepalive = 60
+realdelete = no
+sslcacertfile = /etc/ssl/certs/ca-certificates.crt

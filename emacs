@@ -38,6 +38,8 @@
 (setq auto-save-timeout 600)
 ;; font lock mode
 (global-font-lock-mode t)
+;; confirm exiting emacs
+(setq confirm-kill-emacs 'y-or-n-p)
 
 ;; smart modeline
 (custom-set-variables
@@ -113,7 +115,7 @@
 		. (
 		   ;; first line of a new statement block
 		   (statement-block-intro . +)
-
+		   
 		   ;; First line of a K&R C argument declaration.
 		   (knr-argdecl-intro . +)
 
@@ -157,9 +159,37 @@
   (interactive)
   (define-key c-mode-map "\r" 'newline-and-indent)
   (c-set-style "juniper")
-;;  (flyspell-mode)
-  (abbrev-mode nil))
+  (flyspell-mode)
+  (setq vc-svn-diff-switches '"-u")
+  (define-key c-mode-map "\C-cd" 'vc-diff)
+  (setq dabbrev-case-replace nil)
+  (setq indent-tabs-mode nil)
+  (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
+  (defun toggle-tab-width ()
+    "Toggle the value of tab-width between 4 and 8"
+    (interactive)
+    (if (= tab-width 8)
+      (setq tab-width 4)
+      (if (= tab-width 4)
+	(setq tab-width 8)))
+    (scroll-up 0))
+
+  (defun toggle-c-offset ()
+    "Toggle the value of c-basic-offset between 4 and 8"
+    (interactive)
+    (if (= c-basic-offset 8)
+      (setq c-basic-offset 4)
+      (if (= c-basic-offset 4)
+	(setq c-basic-offset 8)))
+    (scroll-up 0))
+
+  ;; Complement to next-error
+  (defun previous-error (n)
+    "Visit previous compilation error message and corresponding source code."
+    (interactive "p")
+    (next-error (- n)))
+  (abbrev-mode nil))
 (add-hook 'c-mode-common-hook 'juniper-c-default-style)
 
 ;; waf
@@ -175,39 +205,7 @@
 (setq cscope-no-mouse-prompts t)
 (setq cscope-do-not-update-database t)
 (setq cscope-close-window-after-select t)
-
-(add-hook 'c-mode-hook
-	  '(lambda ()
-	     (setq vc-svn-diff-switches '"-u")
-	     (define-key c-mode-map "\C-cd" 'vc-diff)
-	     'juniper-c-default-style
-	     (setq dabbrev-case-replace nil)
-	     (setq indent-tabs-mode nil)
-
-	     (defun toggle-tab-width ()
-	       "Toggle the value of tab-width between 4 and 8"
-	       (interactive)
-	       (if (= tab-width 8)
-		   (setq tab-width 4)
-		 (if (= tab-width 4)
-		     (setq tab-width 8)))
-	       (scroll-up 0))
-
-	     (defun toggle-c-offset ()
-	       "Toggle the value of c-basic-offset between 4 and 8"
-	       (interactive)
-	       (if (= c-basic-offset 8)
-		   (setq c-basic-offset 4)
-		 (if (= c-basic-offset 4)
-		     (setq c-basic-offset 8)))
-	       (scroll-up 0))
-
-	     ;; Complement to next-error
-	     (defun previous-error (n)
-	       "Visit previous compilation error message and corresponding source code."
-	       (interactive "p")
-	       (next-error (- n)))
-	     ))
+(cscope-setup)
 
 ;;; Emulate vi's ":set list" command.  Setting is buffer-local and
 ;;; won't screw up the rest of the editor session.  This probably
@@ -229,10 +227,6 @@
   (interactive)
   (setq buffer-display-table nil))
 
-;; cscope
-(require 'xcscope)
-(setq cscope-no-mouse-prompts t)
-(cscope-setup)
 
 ;; bbdb
 (add-hook 'gnus-startup-hook 'bbdb-insinuate-gnus)
@@ -250,7 +244,7 @@
       ps-print-color-p nil)
 
 ;; emacs server
-(server-start)
+;; (server-start)
 
 ;; workgroups
 ;; (require 'workgroups)

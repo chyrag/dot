@@ -12,6 +12,13 @@
 (setq gnus-select-method
       '(nnmaildir "versa networks" (directory "~/Maildir/")))
 
+(setq nnmail-split-methods '(
+			     ("bugs-ha" "^To: bugs-ha@")
+			     ("bugs-platform" "^To: bugs-platform@")
+			     ("jenkins" "^From: jenkins@")
+			     ("inbox" ".*")
+			     ))
+
 ;; misc reading/composing settings
 (setq
  mm-text-html-renderer 'w3m    ;; use w3m to view html mail
@@ -31,37 +38,38 @@
 (defalias 'gnus-user-format-function-r 'rs-gnus-get-label)
 
 ;; gnus variables
-(setq gnus-permanently-visible-groups "^INBOX\\|^\\[Gmail\\]\\/All\\ Mail\\|^\\[Gmail\\]\\/Drafts\\|^\\[Gmail\\]\\/Sent\\ Mail\\|^tome\\|^attic\\|^build\\|^bugs\\|^versa-sw-blr\\|^versa-blr\\|^git-admin" ;; select groups that we want to see all the time
-      gnus-visible-headers
-      '("From:" "^Newsgroups:" "^Subject:" "^Date:" "^Followup-To:" "^Reply-To:"
-	"^Organization:" "^Summary:" "^Keywords:" "^To:" "^Cc:" "^Posted-To:"
-	"^Mail-Copies-To:" "^Apparently-To:" "^Gnus-Warning:" "^Resent-From:"
-	"X-Sent:" "^User-Agent:" "^X-Mailer:" "^Newsreader:" "^X-Newsreader:"
-        "^X-Accept-Language" "^Message-Id:" "^X-Bugzilla-Who")
+(setq
+ ;; gnus-permanently-visible-groups "^INBOX\\|^\\[Gmail\\]\\/All\\ Mail\\|^\\[Gmail\\]\\/Drafts\\|^\\[Gmail\\]\\/Sent\\ Mail\\|^tome\\|^attic\\|^build\\|^bugs\\|^versa-sw-blr\\|^versa-blr\\|^git-admin" ;; select groups that we want to see all the time
+ gnus-visible-headers
+ '("From:" "^Newsgroups:" "^Subject:" "^Date:" "^Followup-To:" "^Reply-To:"
+   "^Organization:" "^Summary:" "^Keywords:" "^To:" "^Cc:" "^Posted-To:"
+   "^Mail-Copies-To:" "^Apparently-To:" "^Gnus-Warning:" "^Resent-From:"
+   "X-Sent:" "^User-Agent:" "^X-Mailer:" "^Newsreader:" "^X-Newsreader:"
+   "^X-Accept-Language" "^Message-Id:" "^X-Bugzilla-Who")
 
-      gnus-posting-styles '((".*"
-			     (name user-full-name)
-			     (address "chirag@versa-networks.com")
-			     (organization "Versa Networks")
-			     (signature-file "~/.signature")))
-      gnus-summary-line-format "%1{%U%R%z: %}%2{%d%}%5{ %[%4i%] %}%4{%-24,24n%}%6{%-4,4ur%}%5{| %}%(%1{%B%}%s%)\n"
-      gnus-group-mode-line-format "Gnus: %b %d %y [%A] %Z"
-      gnus-group-line-format "%M%S%p%P%5y:%B%(%g%)%O\n"
+  gnus-posting-styles '((".*"
+			(name user-full-name)
+			(address "chirag@versa-networks.com")
+			(organization "Versa Networks")
+			(signature-file "~/.signature")))
+ gnus-summary-line-format "%1{%U%R%z: %}%2{%d%}%5{ %[%4i%] %}%4{%-24,24n%}%6{%-4,4ur%}%5{| %}%(%1{%B%}%s%)\n"
+ gnus-group-mode-line-format "Gnus: %b %d %y [%A] %Z"
+ gnus-group-line-format "%M%S%p%P%5y:%B%(%g%)%O\n"
 
-      gnus-topic-line-format "%i[ %{%(%n%)%} (%g/%A) ]%v\n"
-      gnus-topic-indent-level 4
+ gnus-topic-line-format "%i[ %{%(%n%)%} (%g/%A) ]%v\n"
+ gnus-topic-indent-level 4
 
-      gnus-summary-thread-gathering-function 'gnus-gather-threads-by-references
-      gnus-thread-sort-functions '(lambda (t1 t2) (not (gnus-thread-sort-by-date t1 t2)))
-      gnus-use-cache t
-      gnus-large-newsgroup nil
-      gnus-use-full-window nil)
+ gnus-summary-thread-gathering-function 'gnus-gather-threads-by-references
+ gnus-thread-sort-functions '(lambda (t1 t2) (not (gnus-thread-sort-by-date t1 t2)))
+ gnus-use-cache t
+ gnus-large-newsgroup nil
+ gnus-use-full-window nil)
 
 ;; (add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
 
 ;; smtp mail settings (nullmailer)
 (setq smtpmail-smtp-server "localhost"
-      smtpmail-smtp-service 10025)
+      smtpmail-smtp-service 25)
 
 ;; fontify
 (set-face-foreground 'gnus-group-mail-1-empty "blue")

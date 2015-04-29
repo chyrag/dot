@@ -9,7 +9,7 @@ localrepository = Local
 remoterepository = VersaRemote
 autorefresh = 1
 #presynchook = ~/bin/sync_nnmaildir -g
-#postsynchook = ~/bin/sync_nnmaildir -m
+postsynchook = ~/bin/offlineimap-postsync
 
 [Account jnpr]
 localrepository = Local

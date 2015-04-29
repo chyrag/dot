@@ -1,6 +1,15 @@
+Host gitlab*.versa-networks.com
+	AddressFamily inet
+	Compression yes
+	EscapeChar none
+	ForwardAgent no
+	ForwardX11 no
+
 Host *
 	AddressFamily inet
 	Compression yes
+	ControlMaster auto
+	ControlPath ~/.ssh/master-%r@%h:%p
 	EscapeChar none
 	ForwardAgent yes
 	ForwardX11 yes

@@ -15,16 +15,18 @@
 ;; (add-to-list 'sml/replacer-regexp-list '("^:Git:\\(.*\\)/src/main/java/" ":G/\\1/SMJ:") t)
 
 ;; my sandboxes
-(add-to-list 'sml/replacer-regexp-list '("^~/Work/prototype" ":PROTO") t)
-(add-to-list 'sml/replacer-regexp-list '("^~/Work/shamrock" ":SHAM:") t)
+(add-to-list 'sml/replacer-regexp-list '("^~/Work/14.1R2" ":14.1R2:") t)
+(add-to-list 'sml/replacer-regexp-list '("^~/Work/eos" ":EOS:") t)
 (add-to-list 'sml/replacer-regexp-list '("^~/Work/ha" ":HA:") t)
+(add-to-list 'sml/replacer-regexp-list '("^~/Work/imgr" ":IMGR:") t)
 (add-to-list 'sml/replacer-regexp-list '("^~/Work/ipc" ":IPC:") t)
 (add-to-list 'sml/replacer-regexp-list '("^~/Work/listen2" ":LSTN2:") t)
-(add-to-list 'sml/replacer-regexp-list '("^~/Work/vobj" ":VOBJ:") t)
+(add-to-list 'sml/replacer-regexp-list '("^~/Work/prototype" ":PROTO") t)
+(add-to-list 'sml/replacer-regexp-list '("^~/Work/shamrock2" ":SHAM2:") t)
+(add-to-list 'sml/replacer-regexp-list '("^~/Work/shamrock3" ":SHAM3:") t)
 (add-to-list 'sml/replacer-regexp-list '("^~/Work/vipc" ":VIPC:") t)
+(add-to-list 'sml/replacer-regexp-list '("^~/Work/vobj" ":VOBJ:") t)
 (add-to-list 'sml/replacer-regexp-list '("^~/Work/vstated" ":VSTATE:") t)
-(add-to-list 'sml/replacer-regexp-list '("^~/Work/eos" ":EOS") t)
-
 (provide 'my-sandboxes)
 
 

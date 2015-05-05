@@ -20,17 +20,28 @@
 
 ;; offlineimap
 (require 'offlineimap)
+(offlineimap)
 
 ;; not much
 (autoload 'notmuch "notmuch" "notmuch mail" t)
 (setq notmuch-fcc-dirs nil)	;; Gmail saves sent mails by itself
 (setq notmuch-saved-searches
       '(
-        ("today" .	"date:today..now")
-        ("yesterday" .  "date:yesterday..now")
-        ("week" .	"date:1week..now")
-        ("month" .	"date:1month..now")
-	("inbox" .	"tag:inbox")
+;; why the fuck doesn't this work?
+;;	(:name "inbox" :query "tag:inbox OR tag:unread" :count-query "tag:unread")
+;;	(:name "today" :query "date:today..now" :count-query "tag:unread")
+;; the inbox tag is _all_ the incoming mail; we dont need it here
+;; ("inbox"     . "tag:inbox")
+	("today"     . "date:today..today")
+	("yesterday" . "date:yesterday..yesterday")
+	("bugs"      . "tag:bugs")
+	("team"      . "tag:team")
+	("reviews"   . "tag:reviews")
+	("sanity"    . "tag:sanity")
+	("week"      . "date:sun..today")
+	("month"     . "date:1st..today")
+	("sent"      . "from:chirag@versa-networks.com")
+	("status"    . "tag:status")
 	))
 
 ;; bbdb

@@ -1,0 +1,151 @@
+#!/bin/sh
+################################################################################
+# chirag@versa-networks.com
+
+# source scriptlet library
+. $HOME/bin/lib
+
+################################################################################
+# Environment variables
+export PATH=$HOME/bin:/usr/local/bin:/usr/bin:/bin:/sbin:/usr/sbin:
+export HISTFILESIZE=50000
+export HISTSIZE=50000
+export SAVEHIST=50000
+export EDITOR='vim'
+export PAGER=less
+export TMPDIR=/tmp
+export PS1="\u@\h:\w\$ "
+export SITE="IN" # "US" or "IN" for when in USA or in India
+# the below colors are for linux
+export LS_COLORS="no=00:fi=00:di=00;33:ln=01;36:pi=40;33:so=01;35:bd=40;33;01:cd=40;33;01:or=01;05;37;41:mi=01;05;37;41:ex=01;32:*.cmd=01;32:*.exe=01;32:*.com=01;32:*.btm=01;32:*.bat=01;32:*.sh=01;32:*.csh=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.gz=01;31:*.bz2=01;31:*.bz=01;31:*.tz=01;31:*.rpm=01;31:*.cpio=01;31:*.jpg=01;35:*.gif=01;35:*.bmp=01;35:*.xbm=01;35:*.xpm=01;35:*.png=01;35:*.tif=01;35:"
+# colors for freebsd
+#export LSCOLORS="DxFxCxDxBxEGEDABAGACAD"
+export LC_ALL=C
+export FORTINETDIR=$HOME/Archives/fortinet/forticlientsslvpn
+export PRINTER="HP_HP_LaserJet_400_MFP_M425dn"  # name of printer
+
+# Embassy classic
+# Shanthala Nagar, Ashok Nagar, Bangalore
+# 12.970699, 77.598376
+export VERSA_BLR_LON=12.970699
+export VERSA_BLR_LAT=77.598376
+
+################################################################################
+# Reload History
+history -r
+
+################################################################################
+# Archive mails
+#$HOME/bin/archive-mails
+
+################################################################################
+# Aliases
+alias wb='./waf distclean configure build'
+alias adate='TZ=America/Los_Angeles date'
+alias rebase='git pull --rebase'
+#alias discard='git diff > /tmp/diff && awk \'/^diff/ { print $NF } \\' /tmp/diff  | cut -b3- | xargs git checkout'
+alias lsorig='find . -name \*.orig -o -name \#*\#'
+alias waf='$PWD/waf'
+
+################################################################################
+# TODO
+
+[ -f $HOME/.todo ] && cat -n $HOME/.todo
+
+
+################################################################################
+# functions
+
+# restart xbattbar; required when we switch from laptop screen to external monitor
+restart_xbattbar() {
+    pkill xbattbar
+    xbattbar -c >/dev/null 2>&1 & disown
+}
+
+# connect to Versa Fortinet VPN
+connect_to_versa() {
+    grep -i username $HOME/.forticlientsslvpn
+    if [ "$SITE" = "IN" ]; then
+	VPNSERVER=115.114.125.146
+	VPNPORT=10443
+    else
+	VPNSERVER=108.60.97.78
+	VPNPORT=10443
+    fi
+
+    cd $FORTINETDIR
+    verbose_exec ./forticlientsslvpn_cli  --server $VPNSERVER:$VPNPORT --vpnuser $USER
+}
+
+
+# start VNCviewer to connect to the Versa Lab desktop
+connect_to_vnc() {
+    VNCSRV=10.192.24.191
+    PASS=$HOME/.vnc/passwd
+    #VNCFLAGS="-truecolor -depth 16 -passwd $PASS"
+    VNCFLAGS="-depth 16 -compresslevel 9 -passwd $PASS"
+    echo "You may want to switch to new window now ... (waiting upto 5 seconds)"
+    sleep 5
+    vncviewer $VNCFLAGS $VNCSRV
+}
+
+# print PDF file
+print_pdf() {
+
+## lp -o media=Letter filename
+## lpoptions -d HP_HP_LaserJet_400_MFP_M425dn  -l
+## PageSize/Media Size: Letter Legal Executive FanFoldGermanLegal *A4 A5 A6 B5 195x270mm 184x260mm 197x273mm Postcard DoublePostcardRotated Env10 EnvMonarch EnvISOB5 EnvC5 EnvDL Custom.WIDTHxHEIGHT
+## InputSlot/Paper Source: *Auto Tray1 Tray2 Tray3 Tray1_Man
+## Duplex/Two-Sided: *None DuplexNoTumble DuplexTumble
+## HPOption_Tray3/Tray 3: *False True
+## MediaType/Media Type: *Unspecified Plain HPEcoSMARTLite Light6074 MidWeight96110 Heavy111130 ExtraHeavy131175 MonochromeLaserTransparency Labels Letterhead Envelope Preprinted Prepunched Colored Bond Recycled Rough
+## HPEconoMode/EconoMode: True *False
+
+    lp  -d $PRINTER \
+	-o PageSize=A4 \
+	-o Duplex=DuplexTumble \
+	-o EconoMode=True \
+	$1
+}
+
+
+# setup ssh sessions in master mode so that, we can connect faster later
+setup_ssh_sessions() {
+    ssh-add -l >/dev/null 2>&1
+    if [ $? -ne 0 ]; then
+	echo "Add SSH keys first"
+	return
+    fi
+    if [ ! -e $HOME/.active-vms ]; then
+	echo "$HOME/.active-vms not found"
+	return
+    fi
+    for vm in `grep -v ^# $HOME/.active-vms`
+    do
+	echo $vm | grep -q '@' >/dev/null 2>&1
+	if [ $? -eq 0 ]; then
+	    sock=master-$vm:22
+	else
+	    sock=master-${LOGNAME}@${vm}:22
+	fi
+	#echo "Checking for $sock"
+	if [ -e $HOME/.ssh/$sock ]; then
+	    #echo "$vm is already setup"
+	    continue
+	fi
+	echo -n "$vm"
+	ssh -fMN $vm
+	echo "."
+    done
+}
+
+# tickle offlineimap
+tickle_offlineimap() {
+    pid=`pgrep offlineimap`
+    if [ -z "$pid" ]; then
+	echo "offlineimap not running"
+    else
+	kill -s SIGUSR1 $pid
+	echo "[$pid]"
+    fi
+}

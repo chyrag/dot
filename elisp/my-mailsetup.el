@@ -24,7 +24,9 @@
 
 ;; not much
 (autoload 'notmuch "notmuch" "notmuch mail" t)
-(setq notmuch-fcc-dirs nil)	;; Gmail saves sent mails by itself
+(setq notmuch-fcc-dirs nil	;; Gmail saves sent mails by itself
+      notmuch-hello-logo nil    ;; no logo
+      )
 (setq notmuch-saved-searches
       '(
 ;; why the fuck doesn't this work?
@@ -32,6 +34,7 @@
 ;;	(:name "today" :query "date:today..now" :count-query "tag:unread")
 ;; the inbox tag is _all_ the incoming mail; we dont need it here
 ;; ("inbox"     . "tag:inbox")
+	(:name "new" :query "tag:unread" :count-query "tag:unread")
 	("today"     . "date:today..today")
 	("yesterday" . "date:yesterday..yesterday")
 	("bugs"      . "tag:bugs")
@@ -39,9 +42,12 @@
 	("reviews"   . "tag:reviews")
 	("sanity"    . "tag:sanity")
 	("week"      . "date:sun..today")
-	("month"     . "date:1st..today")
+;; ("month"     . "date:1st..today")
+        ("notes"     . "tag:important")
 	("sent"      . "from:chirag@versa-networks.com")
 	("status"    . "tag:status")
+	("fltrmgrha" . "tag:fltrmgrha")
+	("all"       . "all")
 	))
 
 ;; bbdb

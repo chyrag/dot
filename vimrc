@@ -58,13 +58,6 @@ set showmode
 " Syntax
 syntax on
 
-" code keywords (for, while, return etc) are ugly yellow and dark blue,
-" which look okay on a light background, but unbearable on a dark background.
-" The following changes the C statements to green, and comments to `brown' which
-" looks like more like dull yellow to me
-hi Statement    term=bold cterm=NONE ctermfg=DarkGreen ctermbg=NONE gui=bold guifg=#ffff60 guibg=NONE
-hi Comment      term=bold cterm=NONE ctermfg=brown     ctermbg=NONE gui=bold guifg=#ffff60 guibg=NONE
-
 " Make "show list" more useful.
 set listchars+=tab:^-
 set listchars+=trail:`
@@ -73,8 +66,8 @@ set listchars+=trail:`
 " which look okay on a light background, but unbearable on a dark background.
 " The following changes the C statements to green, and comments to `brown' which
 " looks like more like dull yellow to me
-"hi Statement    term=bold cterm=NONE ctermfg=DarkGreen ctermbg=NONE gui=bold guifg=#ffff60 guibg=NONE
-"hi Comment      term=bold cterm=NONE ctermfg=brown     ctermbg=NONE gui=bold guifg=#ffff60 guibg=NONE
+hi Statement    term=bold cterm=NONE ctermfg=DarkGreen ctermbg=NONE gui=bold guifg=#ffff60 guibg=NONE
+hi Comment      term=bold cterm=NONE ctermfg=brown     ctermbg=NONE gui=bold guifg=#ffff60 guibg=NONE
 
 " The following bindings require vcscommand.vim which is available at
 " http://www.vim.org/scripts/script.php?script_id=90

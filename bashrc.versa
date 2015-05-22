@@ -110,32 +110,37 @@ print_pdf() {
 
 
 # setup ssh sessions in master mode so that, we can connect faster later
-setup_ssh_sessions() {
+setup_ssh_sessions_loop() {
     ssh-add -l >/dev/null 2>&1
     if [ $? -ne 0 ]; then
 	echo "Add SSH keys first"
 	return
     fi
-    if [ ! -e $HOME/.active-vms ]; then
-	echo "$HOME/.active-vms not found"
-	return
-    fi
-    for vm in `grep -v ^# $HOME/.active-vms`
+    find $HOME/.ssh -type s -name master-\* -exec rm -f {} \;
+    while :
     do
-	echo $vm | grep -q '@' >/dev/null 2>&1
-	if [ $? -eq 0 ]; then
-	    sock=master-$vm:22
-	else
-	    sock=master-${LOGNAME}@${vm}:22
+	if [ ! -e $HOME/.active-vms ]; then
+	    echo "$HOME/.active-vms not found"
+	    return
 	fi
-	#echo "Checking for $sock"
-	if [ -e $HOME/.ssh/$sock ]; then
-	    #echo "$vm is already setup"
-	    continue
-	fi
-	echo -n "$vm"
-	ssh -fMN $vm
-	echo "."
+	for vm in `grep -v ^# $HOME/.active-vms`
+	do
+	    echo $vm | grep -q '@' >/dev/null 2>&1
+	    if [ $? -eq 0 ]; then
+		sock=master-$vm:22
+	    else
+		sock=master-${LOGNAME}@${vm}:22
+	    fi
+	    #echo "Checking for $sock"
+	    if [ -e $HOME/.ssh/$sock ]; then
+		#echo "$vm is already setup"
+		continue
+	    fi
+	    echo -n "$vm"
+	    ssh -fMN $vm
+	    echo "."
+	done
+	sleep 10
     done
 }
 
@@ -148,4 +153,9 @@ tickle_offlineimap() {
 	kill -s SIGUSR1 $pid
 	echo "[$pid]"
     fi
+}
+
+# authsock
+authsock() {
+    screen -X stuff "export SSH_AUTH_SOCK=$SSH_AUTH_SOCK^M"
 }

@@ -9,6 +9,8 @@
       disabled-command-hook nil 	;; don't irritate me with disabled commands
       tty-suppress-bold-inverse-default-colors t	;; supress bright colors
       show-paren-mode t			;; highlight matching brackets
+      show-paren-style 'mixed
+
       scroll-step 1			;; scroll one line at a time
       					;; (instead of scrolling half a page)
       transient-mark-mode 't		;; show the marked region
@@ -24,13 +26,19 @@
 
 ;; font lock mode
 (global-font-lock-mode t)
+(setq font-lock-maximum-decoration t)
 ;; we don't want the tool-bar/menu-bar/time
-(fset 'menu-bar-open nil)
 (menu-bar-mode -1)
 (tool-bar-mode -1)
-(blink-cursor-mode -1)
 (scroll-bar-mode -1)
-(display-time-mode -1)
+(blink-cursor-mode -1)
+
+;; custom display time format, and set load average threshold to high
+;; number so that we don't see that in the mode line
+(setq display-time-load-average-threshold 100
+      display-time-format "%a %m/%d %H:%M")
+(display-time)
+;; (display-battery-mode)
 
 ;; remap keys
 (global-set-key "\C-h" 'delete-backward-char)
@@ -44,6 +52,7 @@
 (global-set-key (kbd "<C-down>") 'enlarge-window)
 (global-set-key (kbd "<C-right>") 'shrink-window-horizontally)
 (global-set-key (kbd "<C-left>") 'enlarge-window-horizontally)
+(global-set-key [(control x) (k)] 'kill-this-buffer)
 
 ;; custom screen splitting
 (defun vsplit-last-buffer ()
@@ -61,6 +70,22 @@
 (global-set-key (kbd "C-x 2") 'vsplit-last-buffer)
 (global-set-key (kbd "C-x 3") 'hsplit-last-buffer)
 
+;; REDO (a better way to handle undo and redo)
+;; http://www.wonderworks.com/
+(require 'redo)
+(global-set-key [(control +)] 'redo)
+
+;; WCY-SWBUFF (buffer tab switching code)
+;; found it at http://www.cs.virginia.edu/~wh5a/personal/Emacs/wcy-swbuff.el
+(require 'wcy-swbuff)
+(global-set-key (kbd "<C-tab>") 'wcy-switch-buffer-forward)
+(global-set-key (kbd "<C-S-kp-tab>") 'wcy-switch-buffer-backward)
+
+(defun insert-date ()
+  "Insert date at point."
+  (interactive)
+  (insert (format-time-string "%a %d %b %Y %H:%M %Z")))
+
 ;; smart modeline
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -75,6 +100,10 @@
  ;; If there is more than one, they won't work right.
  )
 
+;; type break
+(require 'type-break)
+(type-break-mode)
+
 ;; Programming mode?
 ;; my sandboxes
 (require 'my-prog-settings)
@@ -82,7 +111,13 @@
 ;; mail setup
 (require 'my-mailsetup)
 
-;; TODO: org-mode?
+;; org-mode
+(require 'org)
+(define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-ca" 'org-agenda)
+(setq org-log-done t)
+(setq org-agenda-files (list "~/Documents/status/current.org"
+			     "~/.todo.org"))
 
 ;; printer
 ;; need custom command to print directly
@@ -98,6 +133,6 @@
 (load "escreen")
 (escreen-install)
 
-;; revbuffs
+;; revbufs
 ;;
 ;; eof

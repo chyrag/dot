@@ -12,7 +12,9 @@
        message-mode-hook (quote (flyspell-mode)) 	;; spell check
        message-citation-line-function 'message-insert-formatted-citation-line 	;; citation line
        message-citation-line-format "On %a, %b %d %Y at %r, %f wrote:"
-       message-send-mail-function 'smtpmail-send-it)
+       message-send-mail-function 'smtpmail-send-it
+       ;;message-auto-save-directory "~/.drafts"
+       )
 
 ;; smtp mail settings (nullmailer)
 (setq smtpmail-smtp-server "localhost"
@@ -62,15 +64,15 @@
       bbdb-dwim-net-address-allow-redundancy t ;; always use full name
       bbdb-quiet-about-name-mismatches 2       ;; show name-mismatches 2 secs
       bbdb-always-add-address t                ;; add new addresses to existing...
-      ;; ...contacts automatically
+                                               ;; ...contacts automatically
       bbdb-canonicalize-redundant-nets-p t     ;; x@foo.bar.cx => x@bar.cx
       bbdb-completion-type nil                 ;; complete on anything
       bbdb-complete-name-allow-cycling t       ;; cycle through matches
-      ;; this only works partially
+                                               ;; this only works partially
       bbbd-message-caching-enabled t           ;; be fast
       bbdb-use-alternate-names t               ;; use AKA
       bbdb-elided-display t                    ;; single-line addresses
-      ;; auto-create addresses from mail
+                                               ;; auto-create addresses from mail
       bbdb/mail-auto-create-p 'bbdb-ignore-some-messages-hook
       bbdb-ignore-some-messages-alist ;; don't ask about fake addresses
       ;; NOTE: there can be only one entry per header (such as To, From)

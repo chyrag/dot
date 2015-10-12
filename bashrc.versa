@@ -7,7 +7,7 @@
 
 ################################################################################
 # Environment variables
-export PATH=$HOME/bin:/usr/local/bin:/usr/bin:/bin:/sbin:/usr/sbin:
+export PATH=$HOME/bin:/usr/local/bin:/usr/bin:/bin:/sbin:/usr/sbin:/usr/lib/git-core:
 export HISTFILESIZE=50000
 export HISTSIZE=50000
 export SAVEHIST=50000
@@ -21,7 +21,7 @@ export LS_COLORS="no=00:fi=00:di=00;33:ln=01;36:pi=40;33:so=01;35:bd=40;33;01:cd
 # colors for freebsd
 #export LSCOLORS="DxFxCxDxBxEGEDABAGACAD"
 export LC_ALL=C
-export FORTINETDIR=$HOME/Archives/fortinet/forticlientsslvpn
+export FORTINETDIR=$HOME/archives/fortinet/forticlientsslvpn
 export PRINTER="HP_HP_LaserJet_400_MFP_M425dn"  # name of printer
 
 # Embassy classic
@@ -46,6 +46,7 @@ alias rebase='git pull --rebase'
 #alias discard='git diff > /tmp/diff && awk \'/^diff/ { print $NF } \\' /tmp/diff  | cut -b3- | xargs git checkout'
 alias lsorig='find . -name \*.orig -o -name \#*\#'
 alias waf='$PWD/waf'
+alias ducks='du -cks * |sort -rn |head -11'
 
 ################################################################################
 # TODO
@@ -116,7 +117,7 @@ setup_ssh_sessions_loop() {
 	echo "Add SSH keys first"
 	return
     fi
-    find $HOME/.ssh -type s -name master-\* -exec rm -f {} \;
+    #find $HOME/.ssh -type s -name master-\* -exec rm -f {} \;
     while :
     do
 	if [ ! -e $HOME/.active-vms ]; then
@@ -157,5 +158,15 @@ tickle_offlineimap() {
 
 # authsock
 authsock() {
-    screen -X stuff "export SSH_AUTH_SOCK=$SSH_AUTH_SOCK^M"
+    screen -r -X stuff "export SSH_AUTH_SOCK=$SSH_AUTH_SOCK^M"
+}
+
+# kill all ssh tunnels
+kill_ssh_tunnels() {
+    ps ax | grep "[f]MN" | awk '{print $1}' | xargs kill
+}
+
+# my procs
+myprocs() {
+    pgrep -a "firefox|emacs|offlineimap"
 }

@@ -19,7 +19,7 @@
 		. (
 		   ;; first line of a new statement block
 		   (statement-block-intro . +)
-		   
+
 		   ;; First line of a K&R C argument declaration.
 		   (knr-argdecl-intro . +)
 
@@ -61,13 +61,16 @@
 (defun juniper-c-default-style ()
   "Set the default c-style for Juniper."
   (interactive)
-  (define-key c-mode-map "\r" 'newline-and-indent)
+  ;; (define-key c-mode-map "\r" 'newline-and-indent)
   (c-set-style "juniper")
   (flyspell-mode)
   (setq vc-svn-diff-switches '"-u")
   (define-key c-mode-map "\C-cd" 'vc-diff)
   (setq dabbrev-case-replace nil)
   (setq indent-tabs-mode nil)
+  (setq tab-always-indent 'complete)
+  (electric-indent-mode t)
+  (electric-pair-mode t)
   (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
   (defun toggle-tab-width ()
@@ -96,12 +99,32 @@
   (abbrev-mode nil))
 (add-hook 'c-mode-common-hook 'juniper-c-default-style)
 
+;; python
+(add-hook 'python-mode-hook '(lambda ()
+			       (local-set-key (kbd "RET") 'newline-and-indent)
+			       (setq python-indent-offset 4)))
+
+;; Versa XML file settings
+(setq nxml-child-indent 4
+      nxml-attribute-indent 4
+      nxml-slash-auto-complete-flag t)
+
 ;; waf
 (setq auto-mode-alist (cons '("wscript" . python-mode) auto-mode-alist))
 (setq compile-command "build-flexvnf.sh")
 
+;; parens
+(require 'paren)
+(show-paren-mode t)
+(setq show-paren-style 'parenthesis)
+;; (setq show-paren-style 'expression)
+
 ;; idutils
 ;; (autoload 'gid "ID" nil t)
+
+;; git
+;; (autoload 'git "git" "Load GIT module" t nil)
+(require 'git)
 
 ;; cscope
 (require 'xcscope)
@@ -111,24 +134,31 @@
 (setq cscope-close-window-after-select t)
 (cscope-setup)
 
-;;; Emulate vi's ":set list" command.  Setting is buffer-local and
-;;; won't screw up the rest of the editor session.  This probably
-;;; should be a minor mode instead of two global functions.  Consider
-;;; using the whitespace.el or show-whitespace-mode.el packages.
+;; autoload gdb-script-mode while editing .gdb files
+(add-to-list 'auto-mode-alist '("\\.gdb$" . gdb-script-mode))
 
-(defvar vi-list-display-table (make-display-table)
-  "vi-list display table for showing tabs and EOLs")
-(aset vi-list-display-table ?\t (vconcat "^I"))
-(aset vi-list-display-table ?\n (vconcat "$\n"))
+;; magit
+(autoload 'magit-status "magit" "Open a Magit status buffer [\u2026]" t nil)
 
-(defun vi-list ()
-  "Simulate a :set list in Vi."
-  (interactive)
-  (setq buffer-display-table vi-list-display-table))
+;; auto-complete
+;; (require 'init-auto-complete)
 
-(defun vi-nolist ()
-  "Simulate a :set nolist in Vi."
-  (interactive)
-  (setq buffer-display-table nil))
+; turn on Semantic
+;; (semantic-mode 1)
+
+; turn on ede mode 
+;; (global-ede-mode 1)
+
+; create a project for our program.
+;;(ede-cpp-root-project "my project" :file "~/demos/my_program/src/main.cpp"
+;;		      :include-path '("/../my_inc"))
+; you can use system-include-path for setting up the system header file locations.
+
+; turn on automatic reparsing of open buffers in semantic
+;; (global-semantic-idle-scheduler-mode 1)
+
+;; start yasnippet with emacs
+;;(require 'yasnippet)
+;;(yas-global-mode 1)
 
 (provide 'my-prog-settings)

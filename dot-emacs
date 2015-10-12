@@ -3,7 +3,7 @@
 ;; General stuff ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; load elisp files from home directory as well.
-(setq load-path (cons (expand-file-name "~/.elisp/") load-path)
+(setq load-path (cons (expand-file-name "~/.emacs.d/") load-path)
       inhibit-startup-message t		;; no startup messages
       inhibit-startup-echo-area-message t
       disabled-command-hook nil 	;; don't irritate me with disabled commands
@@ -28,10 +28,17 @@
 (global-font-lock-mode t)
 (setq font-lock-maximum-decoration t)
 ;; we don't want the tool-bar/menu-bar/time
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
+(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+
 (blink-cursor-mode -1)
+
+;; smart-mode-line
+(require 'smart-mode-line)
+(setq sml/no-confirm-load-theme t)
+(sml/setup)
+(sml/apply-theme 'dark)
 
 ;; custom display time format, and set load average threshold to high
 ;; number so that we don't see that in the mode line
@@ -43,7 +50,9 @@
 ;; remap keys
 (global-set-key "\C-h" 'delete-backward-char)
 (global-set-key "\M- " 'set-mark-command)
-(global-set-key "\M-\C-h" 'backward-kill-word)
+(global-set-key "\C-w" 'backward-kill-word)
+(global-set-key "\C-x\C-k" 'kill-region)
+(global-set-key "\C-c\C-k" 'kill-region)
 (global-set-key "\M-\C-r" 'query-replace)
 (global-set-key "\M-r" 'replace-string)
 (global-set-key "\M-g" 'goto-line)
@@ -70,35 +79,25 @@
 (global-set-key (kbd "C-x 2") 'vsplit-last-buffer)
 (global-set-key (kbd "C-x 3") 'hsplit-last-buffer)
 
-;; REDO (a better way to handle undo and redo)
-;; http://www.wonderworks.com/
-(require 'redo)
-(global-set-key [(control +)] 'redo)
-
-;; WCY-SWBUFF (buffer tab switching code)
-;; found it at http://www.cs.virginia.edu/~wh5a/personal/Emacs/wcy-swbuff.el
-(require 'wcy-swbuff)
-(global-set-key (kbd "<C-tab>") 'wcy-switch-buffer-forward)
-(global-set-key (kbd "<C-S-kp-tab>") 'wcy-switch-buffer-backward)
+;; revert buffers
+(defun revert-all-buffers ()
+  "Refreshes all open buffers from their respective files."
+  (interactive)
+  (dolist (buf (buffer-list))
+    (with-current-buffer buf
+      (when (and (buffer-file-name) (not (buffer-modified-p)))
+        (revert-buffer t t t) )))
+  (message "Refreshed open files."))
 
 (defun insert-date ()
   "Insert date at point."
   (interactive)
   (insert (format-time-string "%a %d %b %Y %H:%M %Z")))
 
-;; smart modeline
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes (quote ("6a37be365d1d95fad2f4d185e51928c789ef7a4ccf17e7ca13ad63a8bf5b922f" "756597b162f1be60a12dbd52bab71d40d6a2845a3e3c2584c6573ee9c332a66e" default))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;; REDO (a better way to handle undo and redo)
+;; http://www.wonderworks.com/
+(require 'redo)
+(global-set-key [(control +)] 'redo)
 
 ;; type break
 (require 'type-break)
@@ -135,4 +134,9 @@
 
 ;; revbufs
 ;;
+;; packages
+(setq package-archives '(("melpa" . "http://melpa.org/packages/")
+			 ("gnu" . "http://elpa.gnu.org/packages/")
+                         ("marmalade" . "https://marmalade-repo.org/packages/")))
+(package-initialize)
 ;; eof

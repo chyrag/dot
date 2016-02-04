@@ -21,8 +21,9 @@ export LS_COLORS="no=00:fi=00:di=00;33:ln=01;36:pi=40;33:so=01;35:bd=40;33;01:cd
 # colors for freebsd
 #export LSCOLORS="DxFxCxDxBxEGEDABAGACAD"
 export LC_ALL=C
-export FORTINETDIR=$HOME/archives/fortinet/forticlientsslvpn
-export PRINTER="HP_HP_LaserJet_400_MFP_M425dn"  # name of printer
+export FORTINETDIR=$HOME/dump/archives/fortinet/forticlientsslvpn
+export PRINTER="HP_HP_LaserJet_400_MFP_M425dn"  # name of printer at office
+#export PRINTER="HP_Deskjet_3540_series"        # name of printer at home
 
 # Embassy classic
 # Shanthala Nagar, Ashok Nagar, Bangalore
@@ -47,6 +48,7 @@ alias rebase='git pull --rebase'
 alias lsorig='find . -name \*.orig -o -name \#*\#'
 alias waf='$PWD/waf'
 alias ducks='du -cks * |sort -rn |head -11'
+alias mp='mplayer -quiet -novideo -idx'
 
 ################################################################################
 # TODO
@@ -67,10 +69,12 @@ restart_xbattbar() {
 connect_to_versa() {
     grep -i username $HOME/.forticlientsslvpn
     if [ "$SITE" = "IN" ]; then
-	VPNSERVER=115.114.125.146
+	#VPNSERVER=115.114.125.146
+	VPNSERVER=182.75.39.206
 	VPNPORT=10443
     else
-	VPNSERVER=108.60.97.78
+	#VPNSERVER=108.60.97.78
+	VPNSERVER=us.versa-networks.com
 	VPNPORT=10443
     fi
 
@@ -117,6 +121,9 @@ setup_ssh_sessions_loop() {
 	echo "Add SSH keys first"
 	return
     fi
+    if ! grep -q 10.48.0.99 /etc/resolv.conf; then
+	sudo cp $HOME/dump/archives/netconfig/blr-work/resolv.conf /etc/resolv.conf
+    fi
     #find $HOME/.ssh -type s -name master-\* -exec rm -f {} \;
     while :
     do
@@ -147,26 +154,44 @@ setup_ssh_sessions_loop() {
 
 # tickle offlineimap
 tickle_offlineimap() {
-    pid=`pgrep offlineimap`
-    if [ -z "$pid" ]; then
-	echo "offlineimap not running"
-    else
-	kill -s SIGUSR1 $pid
-	echo "[$pid]"
-    fi
+#    pid=`pgrep offlineimap`
+#    if [ -z "$pid" ]; then
+#	echo "offlineimap not running"
+#    else
+#	kill -s SIGUSR1 $pid
+#	echo "[$pid]"
+#    fi
+    pkill --signal SIGUSR1 offlineimap
 }
 
 # authsock
 authsock() {
-    screen -r -X stuff "export SSH_AUTH_SOCK=$SSH_AUTH_SOCK^M"
+    if [ $# -gt 0 ]; then
+	screen -r -S $1 -X stuff "export SSH_AUTH_SOCK=$SSH_AUTH_SOCK"
+    else
+	screen -r -X stuff "export SSH_AUTH_SOCK=$SSH_AUTH_SOCK"
+    fi
 }
 
 # kill all ssh tunnels
 kill_ssh_tunnels() {
-    ps ax | grep "[f]MN" | awk '{print $1}' | xargs kill
+    pids=$(ps ax | grep "[f]MN" | awk '{print $1}')
+    if [ -n "$pids" ]; then
+	kill $pids
+    fi
+    find $HOME/.ssh -type s -name "master-*" -exec rm -f {} \;
+}
+
+nuke_hist() {
+    export HISTFILE=""
 }
 
 # my procs
 myprocs() {
-    pgrep -a "firefox|emacs|offlineimap"
+    pgrep -a "firefox|emacs|offlineimap|redshift|xbattbar|ssh-agent|dwm|xwrits"
+}
+
+# show whitespace changes
+show_ws() {
+    git show | grep -E "^diff|^@@|^[-\+].+[[:space:]]+$" 
 }

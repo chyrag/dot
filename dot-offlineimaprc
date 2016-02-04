@@ -2,6 +2,7 @@
 # suit to get started fast.
 
 [general]
+ui = quiet
 accounts = jnpr, versa
 
 [Account versa]
@@ -9,7 +10,9 @@ localrepository = Local
 remoterepository = VersaRemote
 autorefresh = 1
 #presynchook = ~/bin/sync_nnmaildir -g
-postsynchook = ~/bin/offlineimap-postsync
+#postsynchook = ~/bin/offlineimap-postsync
+postsynchook = notmuch new
+#postsynchook = mu index
 
 [Account jnpr]
 localrepository = Local

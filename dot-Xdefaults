@@ -1,8 +1,18 @@
+!! Emacs !!
 emacs*background: #000000
-emacs*borderWidth: 0
+emacs*foreground: #d1d1d1
+!emacs*font: terminus-iso8859-16-bold-28
 emacs*font: 10x20
-emacs*foreground: #dddddd
+! better to turn this off here than in .emacs
+! where it has already been loaded.
+emacs.menuBar: off
+emacs.toolBar: off
+! no scrollbars for me
+emacs.verticalScrollBars: off
+emacs*borderWidth: 0
 emacs*internalBorder: 0
+
+!! Terminal emulator !!
 xterm*cursorColor: yellow
 xterm*font: 10x20
 xterm*foreground: #dddddd

@@ -1,53 +1,79 @@
 ;;; -*-Emacs-Lisp-*-
 
+;;
 ;; General stuff ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+
+
+
+;; This sets up the load path so that we can override it
+(package-initialize nil)
+;; Override the packages with the git version of Org and other packages
+(add-to-list 'load-path "~/.emacs.d")
+(add-to-list 'load-path "/usr/share/emacs24/site-lisp/mu4e")
+(add-to-list 'load-path "/usr/local/share/emacs/site-lisp")
+;; load packages before configuring them
+(setq package-archives '(("melpa" . "http://melpa.org/packages/")
+			 ("gnu" . "http://elpa.gnu.org/packages/")
+			 ("marmalade" . "https://marmalade-repo.org/packages/")))
+;; Load the rest of the packages
+(package-initialize)
+;; (setq package-enable-at-startup nil)
+
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+(setq use-package-verbose t)
+(require 'use-package)
+(use-package auto-compile
+	     :ensure t
+	     :config (auto-compile-on-load-mode))
+(setq load-prefer-newer t)
 
 ;; load elisp files from home directory as well.
-(setq load-path (cons (expand-file-name "~/.emacs.d/") load-path)
-      inhibit-startup-message t		;; no startup messages
+(setq inhibit-startup-message t		;; no startup messages
       inhibit-startup-echo-area-message t
-      disabled-command-hook nil 	;; don't irritate me with disabled commands
+      inhibit-splash-screen t
+      disabled-command-hook nil		;; don't irritate me with disabled commands
       tty-suppress-bold-inverse-default-colors t	;; supress bright colors
-      show-paren-mode t			;; highlight matching brackets
-      show-paren-style 'mixed
-
       scroll-step 1			;; scroll one line at a time
-      					;; (instead of scrolling half a page)
+					;; (instead of scrolling half a page)
       transient-mark-mode 't		;; show the marked region
       visible-bell t			;; no audible bell
       next-line-add-newlines nil	;; stop at the end of the file, not just add lines
       require-final-newline t		;; always end a file with a newline
-      line-number-mode t 		;; show linecolumn number in the modeline
+      line-number-mode t		;; show linecolumn number in the modeline
       column-number-mode t
       make-backup-files nil		;; no backups
       auto-save-interval 0
       auto-save-timeout 600
       confirm-kill-emacs 'y-or-n-p)
 
-;; font lock mode
+;;
+;; Display settings ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+
 (global-font-lock-mode t)
 (setq font-lock-maximum-decoration t)
 ;; we don't want the tool-bar/menu-bar/time
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
-
 (blink-cursor-mode -1)
-
-;; smart-mode-line
-(require 'smart-mode-line)
-(setq sml/no-confirm-load-theme t)
-(sml/setup)
-(sml/apply-theme 'dark)
 
 ;; custom display time format, and set load average threshold to high
 ;; number so that we don't see that in the mode line
 (setq display-time-load-average-threshold 100
-      display-time-format "%a %m/%d %H:%M")
+      display-time-format "%a %m/%d %H:%M  ")
 (display-time)
 ;; (display-battery-mode)
+(require 'yahoo-weather)
+(setq yahoo-weather-location "Bangalore")
+(yahoo-weather-mode)
 
-;; remap keys
+;;
+;; Key bindings ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+
 (global-set-key "\C-h" 'delete-backward-char)
 (global-set-key "\M- " 'set-mark-command)
 (global-set-key "\C-w" 'backward-kill-word)
@@ -62,6 +88,13 @@
 (global-set-key (kbd "<C-right>") 'shrink-window-horizontally)
 (global-set-key (kbd "<C-left>") 'enlarge-window-horizontally)
 (global-set-key [(control x) (k)] 'kill-this-buffer)
+(global-set-key "\C-x\C-m" 'execute-extended-command)
+(global-set-key "\C-c\C-m" 'execute-extended-command)
+(global-set-key (kbd "<f6>") (lambda() (interactive)(load-file "~/.emacs")))
+
+;;
+;; Utility Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
 
 ;; custom screen splitting
 (defun vsplit-last-buffer ()
@@ -86,7 +119,7 @@
   (dolist (buf (buffer-list))
     (with-current-buffer buf
       (when (and (buffer-file-name) (not (buffer-modified-p)))
-        (revert-buffer t t t) )))
+	(revert-buffer t t t) )))
   (message "Refreshed open files."))
 
 (defun insert-date ()
@@ -94,31 +127,7 @@
   (interactive)
   (insert (format-time-string "%a %d %b %Y %H:%M %Z")))
 
-;; REDO (a better way to handle undo and redo)
-;; http://www.wonderworks.com/
-(require 'redo)
-(global-set-key [(control +)] 'redo)
-
-;; type break
-(require 'type-break)
-(type-break-mode)
-
-;; Programming mode?
-;; my sandboxes
-(require 'my-prog-settings)
-
-;; mail setup
-(require 'my-mailsetup)
-
-;; org-mode
-(require 'org)
-(define-key global-map "\C-cl" 'org-store-link)
-(define-key global-map "\C-ca" 'org-agenda)
-(setq org-log-done t)
-(setq org-agenda-files (list "~/Documents/status/current.org"
-			     "~/.todo.org"))
-
-;; printer
+;; Print from emacs
 ;; need custom command to print directly
 ;; a2ps -P HP_HP_LaserJet_400_MFP_M425dn -s duplex
 (setq ps-printer-name "HP_HP_LaserJet_400_MFP_M425dn"
@@ -128,15 +137,26 @@
       ps-auto-font-detect nil
       ps-print-color-p nil)
 
-;; screens
-(load "escreen")
-(escreen-install)
-
-;; revbufs
 ;;
-;; packages
-(setq package-archives '(("melpa" . "http://melpa.org/packages/")
-			 ("gnu" . "http://elpa.gnu.org/packages/")
-                         ("marmalade" . "https://marmalade-repo.org/packages/")))
-(package-initialize)
+;; Misc packages ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+(require 'my-pkgs-config)
+
+;;
+;; Mail setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+(require 'my-mailsetup)
+
+;;
+;; Settings for programming ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+(require 'my-prog-settings)
+
+;; modeline color
+;;(set-face-foreground 'mode-line "white")
+;;(set-face-background 'mode-line "purple")
+;;(set-face-background 'mode-line "sea green")
+;; (set-face-background 'mode-line-inactive "light blue")
+;;(set-face-background 'mode-line-inactive "gray")
+
 ;; eof

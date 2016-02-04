@@ -5,6 +5,12 @@ PATH=/usr/local/bin:$PATH
 # figure out if we have multi-monitor setup
 $HOME/bin/reset-display
 
+# toggle touchpad
+$HOME/bin/toggle-trackpad
+
+# need to switch to powersave mode once, after we login
+sudo cpufreq-set --governor powersave
+
 # grab my X-settings
 xrdb .Xdefaults
 
@@ -20,9 +26,9 @@ xsetroot -solid Black
 # dim the display
 xbacklight -set 10
 
-VERSA_BLR_LON=12.970699
-VERSA_BLR_LAT=77.598376
-redshift -l $VERSA_BLR_LAT:$VERSA_BLR_LON &
+VERSA_BLR_LAT=12.970699
+VERSA_BLR_LON=77.598376
+redshift -l $VERSA_BLR_LAT:$VERSA_BLR_LON -g 0.5 -m vidmode &
 
 # battery
 xbattbar -c &

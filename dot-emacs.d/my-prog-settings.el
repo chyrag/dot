@@ -5,6 +5,17 @@
 ;; my sandboxes
 (require 'my-sandboxes)
 
+;; projectile
+;; (require 'projectile)
+;; (projectile-global-mode)
+;; (setq projectile-completion-system 'helm)
+;; (helm-projectile-on)
+
+;; whitespace variables
+(setq whitespace-line-column 80) ;; limit line length
+(setq whitespace-style '(face empty tabs lines-tail trailing))
+
+
 ;;;
 ;;; Format code the Juniper way
 ;;;
@@ -64,31 +75,35 @@
   ;; (define-key c-mode-map "\r" 'newline-and-indent)
   (c-set-style "juniper")
   (flyspell-mode)
+  (projectile-mode)
   (setq vc-svn-diff-switches '"-u")
   (define-key c-mode-map "\C-cd" 'vc-diff)
   (setq dabbrev-case-replace nil)
   (setq indent-tabs-mode nil)
   (setq tab-always-indent 'complete)
   (electric-indent-mode t)
-  (electric-pair-mode t)
-  (add-hook 'before-save-hook 'delete-trailing-whitespace)
+  ;; (electric-pair-mode t) ; damn irritating!
+  ;; (add-hook 'before-save-hook 'delete-trailing-whitespace
+  (whitespace-mode)
+  (show-paren-mode t)
+  (setq show-paren-style 'parenthesis)
 
   (defun toggle-tab-width ()
     "Toggle the value of tab-width between 4 and 8"
     (interactive)
     (if (= tab-width 8)
-      (setq tab-width 4)
-      (if (= tab-width 4)
-	(setq tab-width 8)))
+	(setq tab-width 4)
+      ((insert )f (= tab-width 4)
+       (setq tab-width 8)))
     (scroll-up 0))
 
   (defun toggle-c-offset ()
     "Toggle the value of c-basic-offset between 4 and 8"
     (interactive)
     (if (= c-basic-offset 8)
-      (setq c-basic-offset 4)
+	(setq c-basic-offset 4)
       (if (= c-basic-offset 4)
-	(setq c-basic-offset 8)))
+	  (setq c-basic-offset 8)))
     (scroll-up 0))
 
   ;; Complement to next-error
@@ -124,14 +139,13 @@
 
 ;; git
 ;; (autoload 'git "git" "Load GIT module" t nil)
-(require 'git)
+;; (require 'git)
 
 ;; cscope
 (require 'xcscope)
-(cscope-setup)
-(setq cscope-no-mouse-prompts t)
-(setq cscope-do-not-update-database t)
+(setq cscope-option-do-not-update-database t)
 (setq cscope-close-window-after-select t)
+(setq cscope-option-use-inverted-index t)
 (cscope-setup)
 
 ;; autoload gdb-script-mode while editing .gdb files
@@ -140,19 +154,14 @@
 ;; magit
 (autoload 'magit-status "magit" "Open a Magit status buffer [\u2026]" t nil)
 
-;; auto-complete
-;; (require 'init-auto-complete)
+;; start yasnippet with emacs
+;; (require 'yasnippet)
+;; (yas-global-mode 1)
 
-; turn on Semantic
-;; (semantic-mode 1)
-
-; turn on ede mode 
-;; (global-ede-mode 1)
-
-; create a project for our program.
-;;(ede-cpp-root-project "my project" :file "~/demos/my_program/src/main.cpp"
-;;		      :include-path '("/../my_inc"))
-; you can use system-include-path for setting up the system header file locations.
+;; bugz
+;;(require 'bugz-mode)
+;;(setq bugz-db-base "http://bugzilla.versa-networks.com/xmlrpc.cgi")
+;;(setq bugz-db-user "chirag@versa-networks.com")
 
 ; turn on automatic reparsing of open buffers in semantic
 ;; (global-semantic-idle-scheduler-mode 1)

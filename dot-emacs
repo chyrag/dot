@@ -1,84 +1,153 @@
-;;; -*-Emacs-Lisp-*-
+;;; init.el
 
-;;
-;; General stuff ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
+
+;;; Code:
 
+(defconst start-time (current-time))
+(defvar my-dir (expand-file-name "~/Dropbox/dotfiles/emacs.d")
+  "The root dir for my Emacs configuration.")
+(defvar my-tmp (expand-file-name "tmp" user-emacs-directory)
+  "Temp files that might be useful but that I don't care about.")
+(defvar my-personal-dir (expand-file-name "~/Dropbox/emacs/personal"))
+(defvar my-icons-dir (expand-file-name "icons" my-dir)
+  "Where All the icons are stored.")
+(unless (file-exists-p my-tmp) (make-directory my-tmp))
 
+
+;;; Basic preferences
+;;;
 
-;; This sets up the load path so that we can override it
-(package-initialize nil)
-;; Override the packages with the git version of Org and other packages
-(add-to-list 'load-path "~/.emacs.d")
-(add-to-list 'load-path "/usr/share/emacs24/site-lisp/mu4e")
-(add-to-list 'load-path "/usr/local/share/emacs/site-lisp")
-;; load packages before configuring them
-(setq package-archives '(("melpa" . "http://melpa.org/packages/")
-			 ("gnu" . "http://elpa.gnu.org/packages/")
-			 ("marmalade" . "https://marmalade-repo.org/packages/")))
-;; Load the rest of the packages
-(package-initialize)
-;; (setq package-enable-at-startup nil)
+;;; Colors
+(deftheme blah "My custom colors over the default set")
+(let ((fg           "#dddddd")
+      (bg           "#000000")
+      (steelblue    "#4682b4")
+      (searchcolor1 "#228b22")
+      (searchcolor2 "#6b8e35")
+      (searchcolor3 "#556b2f")
+      (selected     "#00868b")
+      (dgreen       "#00aa00")
+      (indianred    "#cd5c5c")
+      (skyblue      "#00bfff")
+      )
+  (custom-theme-set-faces
+   'blah
+   `(default                     ((t (:foreground ,fg :background ,bg))))
+   `(mode-line                   ((t (:foreground ,fg :background ,steelblue))))
+   `(swiper-line-face            ((t (:foreground ,fg :background ,searchcolor3))))
+   `(region                      ((t (:background ,selected))))
+   `(diff-hl-insert              ((t (:background ,dgreen))))
+   `(diff-hl-delete              ((t (:background ,indianred))))
+   `(diff-hl-change              ((t (:background ,skyblue))))
+))
+
+(when window-system
+  (tooltip-mode -1)
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1)
+;;  (set-default-font "Inconsolata:style=bold:size=20")
+;;  (set-default-font "Hack:style=bold:size=18")
+;;  (set-default-font "10x20")
+  (setq frame-title-format '(buffer-file-name "%f" ("%b")))
+  (set-frame-parameter nil 'fullscreen 'fullboth)
+  (setq-default frame-background-mode 'dark))
+
+;; sane defaults
+(setq-default
+ auto-revert-verbose nil
+ auto-save-interval 0
+ auto-save-timeout 600
+ blink-matching-paren nil
+ column-number-mode t
+ confirm-kill-emacs 'y-or-n-p
+ confirm-nonexistent-file-or-buffer nil
+ delete-by-moving-to-trash nil
+ delete-selection-mode t
+ diary-file "~/.diary"
+ dired-dwim-target t
+ display-time-load-average-threshold 100
+ display-time-format "%a %m/%d %H:%M "
+ echo-keystrokes 0.02
+ ediff-split-window-function 'split-window-horizontally
+ ediff-window-setup-function 'ediff-setup-windows-plain
+ electric-indent-mode nil
+ fill-column 80
+ font-lock-maximum-decoration t
+ gc-cons-threshold 50000000
+ global-auto-revert-non-file-buffers t
+ history-length 1000
+ indent-tabs-mode nil
+ inhibit-startup-message t
+ initial-major-mode 'text-mode
+ initial-scratch-message ""
+ large-file-warning-threshold 100000000
+ line-number-mode t
+ make-backup-files nil
+ next-error-highlight t
+ next-error-highlight-no-select t
+ next-line-add-newlines nil
+ org-directory "~/.emacs.d/org/"
+ query-replace-highlight t
+ recentf-max-saved-items 100
+ require-final-newline t
+ ring-bell-function #'ignore
+
+ scroll-conservatively 100000
+ scroll-margin 3
+ scroll-preserve-screen-position 1
+ sentence-end-double-space nil
+ shift-select-mode nil
+ tab-always-indent 'complete
+ tramp-persistency-file-name (expand-file-name "tramp" my-tmp)
+ transient-mark-mode t
+ truncate-lines t
+ truncate-partial-width-windows nil
+ visible-bell t
+ x-select-enable-clipboard t)
+
+(auto-compression-mode +1)
+(blink-cursor-mode -1)
+(global-font-lock-mode +1)
+(global-hl-line-mode +1)
+(show-paren-mode +1)
+(winner-mode +1)
+(display-time)
+(flyspell-mode)
+(set-language-environment "ASCII")
+
+
+;;; Bootstrap `use-package'
+
+(setq package-archives
+      '(("gnu" . "http://elpa.gnu.org/packages/")
+        ("melpa" . "http://melpa.org/packages/")
+        ("marmalade" . "https://marmalade-repo.org/packages/")))
+(setq package-enable-at-startup nil)
+(package-initialize 'noactivate)
 
 (unless (package-installed-p 'use-package)
+  (package-refresh-contents)
   (package-install 'use-package))
+
+(package-initialize)
+(add-to-list 'load-path "~/.emacs.d")
+(let ((default-directory (concat user-emacs-directory "elpa/")))
+  (normal-top-level-add-subdirs-to-load-path))
+
+(eval-when-compile
+  (require 'use-package))
+(require 'bind-key)
+(require 'diminish nil t)
 (setq use-package-verbose t)
-(require 'use-package)
-(use-package auto-compile
-	     :ensure t
-	     :config (auto-compile-on-load-mode))
-(setq load-prefer-newer t)
+(setq use-package-always-ensure t) ;; use during first time installation to install packages
 
-;; load elisp files from home directory as well.
-(setq inhibit-startup-message t		;; no startup messages
-      inhibit-startup-echo-area-message t
-      inhibit-splash-screen t
-      disabled-command-hook nil		;; don't irritate me with disabled commands
-      tty-suppress-bold-inverse-default-colors t	;; supress bright colors
-      scroll-step 1			;; scroll one line at a time
-					;; (instead of scrolling half a page)
-      transient-mark-mode 't		;; show the marked region
-      visible-bell t			;; no audible bell
-      next-line-add-newlines nil	;; stop at the end of the file, not just add lines
-      require-final-newline t		;; always end a file with a newline
-      line-number-mode t		;; show linecolumn number in the modeline
-      column-number-mode t
-      make-backup-files nil		;; no backups
-      auto-save-interval 0
-      auto-save-timeout 600
-      confirm-kill-emacs 'y-or-n-p)
-
-;;
-;; Display settings ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-
-(global-font-lock-mode t)
-(setq font-lock-maximum-decoration t)
-;; we don't want the tool-bar/menu-bar/time
-(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
-(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
-(blink-cursor-mode -1)
-
-;; custom display time format, and set load average threshold to high
-;; number so that we don't see that in the mode line
-(setq display-time-load-average-threshold 100
-      display-time-format "%a %m/%d %H:%M  ")
-(display-time)
-;; (display-battery-mode)
-(require 'yahoo-weather)
-(setq yahoo-weather-location "Bangalore")
-(yahoo-weather-mode)
-
-;;
-;; Key bindings ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-
+;;; Key bindings
 (global-set-key "\C-h" 'delete-backward-char)
 (global-set-key "\M- " 'set-mark-command)
 (global-set-key "\C-w" 'backward-kill-word)
 (global-set-key "\C-x\C-k" 'kill-region)
-(global-set-key "\C-c\C-k" 'kill-region)
+(global-set-key "\C-c\C-k" 'copy-line)
 (global-set-key "\M-\C-r" 'query-replace)
 (global-set-key "\M-r" 'replace-string)
 (global-set-key "\M-g" 'goto-line)
@@ -91,10 +160,7 @@
 (global-set-key "\C-x\C-m" 'execute-extended-command)
 (global-set-key "\C-c\C-m" 'execute-extended-command)
 (global-set-key (kbd "<f6>") (lambda() (interactive)(load-file "~/.emacs")))
-
-;;
-;; Utility Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
+(global-set-key (kbd "\C-c o") (lambda() (interactive)(find-file (expand-file-name "todo.org" org-directory))))
 
 ;; custom screen splitting
 (defun vsplit-last-buffer ()
@@ -112,14 +178,14 @@
 (global-set-key (kbd "C-x 2") 'vsplit-last-buffer)
 (global-set-key (kbd "C-x 3") 'hsplit-last-buffer)
 
-;; revert buffers
+;; Revert buffers
 (defun revert-all-buffers ()
   "Refreshes all open buffers from their respective files."
   (interactive)
   (dolist (buf (buffer-list))
     (with-current-buffer buf
       (when (and (buffer-file-name) (not (buffer-modified-p)))
-	(revert-buffer t t t) )))
+        (revert-buffer t t t) )))
   (message "Refreshed open files."))
 
 (defun insert-date ()
@@ -127,36 +193,701 @@
   (interactive)
   (insert (format-time-string "%a %d %b %Y %H:%M %Z")))
 
-;; Print from emacs
-;; need custom command to print directly
-;; a2ps -P HP_HP_LaserJet_400_MFP_M425dn -s duplex
-(setq ps-printer-name "HP_HP_LaserJet_400_MFP_M425dn"
-      ps-printer-name-option "-P"
-      ps-lpr-command "a2ps"
-      ps-spool-duplex t
-      ps-auto-font-detect nil
-      ps-print-color-p nil)
+
+;; automatically compile the .el files to .elc
+(use-package auto-compile
+  :commands (auto-compile-on-load-mode
+             auto-compile-on-save-mode)
+  :config
+  (setq load-prefer-newer t)
+  (auto-compile-on-load-mode)
+  (auto-compile-on-save-mode))
 
-;;
-;; Misc packages ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-(require 'my-pkgs-config)
+;; make the whitespace standout
+(use-package whitespace
+  :init
+  (dolist (hook '(prog-mode-hook text-mode-hook
+                                 conf-mode-hook))
+    (add-hook hook #'whitespace-mode))
+  :config
+  (setq whitespace-line-column 80) ;; limit line length
+  (setq whitespace-style '(face empty tabs lines-tail trailing))
+  :diminish whitespace-mode)
 
-;;
-;; Mail setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-(require 'my-mailsetup)
+;; make the whitespace cleanup as default
+(use-package whitespace-cleanup-mode
+  :config
+  (global-whitespace-cleanup-mode)
+  :diminish whitespace-cleanup-mode)
 
-;;
-;; Settings for programming ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-(require 'my-prog-settings)
+(use-package subword
+  :diminish subword-mode
+  :config
+  (global-subword-mode +1))
 
-;; modeline color
-;;(set-face-foreground 'mode-line "white")
-;;(set-face-background 'mode-line "purple")
-;;(set-face-background 'mode-line "sea green")
-;; (set-face-background 'mode-line-inactive "light blue")
-;;(set-face-background 'mode-line-inactive "gray")
+;; quick way to recall the last files that were open
+(use-package recentf
+  :diminish recentf-mode
+  :init
+  (setq recentf-save-file (expand-file-name "recentf" my-tmp))
+  (setq recentf-max-menu-items 50)
+  :config
+  (add-to-list 'recentf-exclude (expand-file-name ".*" my-tmp))
+  (add-to-list 'recentf-exclude (expand-file-name ".*" org-directory))
+  (add-to-list 'recentf-exclude (expand-file-name "elpa/.*" user-emacs-directory))
+  (add-to-list 'recentf-exclude (expand-file-name "~/.type-break"))
+  (add-to-list 'recentf-exclude (expand-file-name "~/#.type-break#"))
+  (add-to-list 'recentf-exclude (expand-file-name my-personal-dir))
+  (recentf-mode +1))
 
-;; eof
+;; remember the last place in the files
+(use-package saveplace
+  :config
+  (setq-default save-place t
+                save-place-forget-unreadable-files nil
+                save-place-file (expand-file-name "place" my-tmp)))
+
+;; uniquify buffer names for files with identical names
+(use-package uniquify
+  :ensure nil
+  :defer t
+  :init
+  (setq uniquify-buffer-name-style 'reverse
+        uniquify-separator " • "
+        uniquify-after-kill-buffer-p t
+        uniquify-ignore-buffers-re "^\\*"))
+
+(use-package dabbrev
+  :config
+  (setq dabbrev-case-replace nil)
+  :diminish dabbrev-mode)
+
+(use-package yahoo-weather
+  :defer 10
+  :init
+  (setq yahoo-weather-location "Bangalore")
+  ;; (setq yahoo-weather-location "Santa Clara, CA")
+  :config
+  (yahoo-weather-mode))
+
+(use-package counsel)
+(use-package ivy
+  :diminish ivy-mode
+  :after counsel
+  :init
+  (setq ivy-use-virtual-buffers t)
+  :config
+  (ivy-mode 1)
+  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+  (global-set-key (kbd "C-x C-r") 'ivy-recentf))
+
+;;; Tool
+(use-package smex
+  :bind
+  (("M-x" . smex)
+   ("M-X" . smex-major-mode-commands))
+  :config
+  (smex-initialize))
+
+(use-package autorevert
+  :diminish auto-revert-mode
+  :init
+  (global-auto-revert-mode +1)
+  (add-hook 'find-file-hook `(lambda () (auto-revert-mode +1))))
+
+(use-package avy
+  :bind
+  ("C-;" . avy-goto-char)
+  ("M-s" . avy-goto-word-1)
+  :init
+  :config
+  (avy-setup-default))
+
+;; highlight the changes to the buffer
+(use-package volatile-highlights
+  :diminish volatile-highlights-mode
+  :config
+  (volatile-highlights-mode t))
+
+;; Draw a tail in the trail of typed characters; disabled as of now; 
+;; to enable it, put the following in the :init section
+;;  (highlight-tail-mode)
+(use-package highlight-tail
+  :diminish highlight-tail-mode
+  :config
+  (setq highlight-tail-steps 14
+	highlight-tail-timer 1
+	highlight-colors '(("black" . 0 )
+                           ("#bc2525" . 25)
+                           ("black" . 66))
+        highlight-tail-posterior-type 'const))
+
+(use-package win-switch
+  :bind
+  ("C-x o" . win-switch-dispatch)
+  :config
+  (setq win-switch-feedback-background-color "#6c96af")
+  (setq win-switch-feedback-foreground-color "#000000")
+  (setq win-switch-window-threshold 1)
+  (setq win-switch-idle-time 0.7)
+  (win-switch-set-keys '("o") 'next-window)
+  (win-switch-set-keys '("p") 'previous-window))
+
+(use-package undo-tree
+  :bind
+  ("C-x u" . undo-tree-visualize)
+  :diminish undo-tree-mode
+  :commands global-undo-tree-mode
+  :config
+  (global-undo-tree-mode))
+
+(use-package expand-region
+  :bind
+  ("C-=" . er/expand-region))
+
+(use-package multiple-cursors
+  :bind
+  (("C-S-c C-S-c" . mc/edit-lines)
+   ("C->"         . mc/mark-next-like-this)
+   ("C-<"         . mc/mark-previous-like-this)
+   ("C-c C-<"     . mc/mark-all-like-this)))
+
+(use-package which-key
+  :diminish which-key-mode
+  :defer 5
+  :commands
+  which-key-mode
+  :config
+  (which-key-mode +1))
+
+(use-package visual-regexp
+  :bind
+  ("C-c r" . vr/replace)
+  ("C-c q" . vr/query-replace))
+
+(use-package highlight-symbol
+  :diminish highlight-symbol-mode
+  :commands
+  (highlight-symbol-mode highlight-symbol-nav-mode)
+  :bind
+  ("C-<f3>" . highlight-symbol)
+  :init
+  (dolist (hook '(prog-mode-hook html-mode-hook css-mode-hook))
+    (add-hook hook #'highlight-symbol-mode)
+    (add-hook hook #'highlight-symbol-nav-mode)))
+
+;; cscope
+;; (use-package xcscope
+;; 	     :defer t
+;; 	     :init
+;; 	     (setq cscope-option-do-not-update-database t)
+;; 	     (setq cscope-close-window-after-select t)
+;; 	     (setq cscope-option-use-inverted-index t)
+;; 	     :config
+;; 	     (cscope-setup))
+(require 'xcscope)
+(setq cscope-option-do-not-update-database t)
+(setq cscope-close-window-after-select t)
+(setq cscope-option-use-inverted-index t)
+(cscope-setup)
+
+;; highlight uncommitted changes
+(use-package diff-hl
+  :ensure t
+  :commands global-diff-hl-mode
+  :init
+  (setq diff-hl-draw-borders nil)
+  :config
+  ;; (diff-hl-margin-mode)
+  (global-diff-hl-mode +1))
+
+;; (use-package git-gutter
+;;   :init
+;;   (global-git-gutter-mode t)
+;;   (global-set-key (kbd "C-x C-g") 'git-gutter:toggle)
+;;   (global-set-key (kbd "C-x v =") 'git-gutter:popup-hunk)
+;;   (global-set-key (kbd "C-x v p") 'git-gutter:previous-hunk)
+;;   (global-set-key (kbd "C-x v n") 'git-gutter:next-hunk)
+;;   (global-set-key (kbd "C-x v r") 'git-gutter:revert-hunk)
+;;   (global-set-key (kbd "C-x v SPC") 'git-gutter:mark-hunk)
+;;   (global-set-key (kbd "C-x v s") 'git-gutter:stage-hunk))
+
+
+;; rainbow-mode to display colors as the background of the hex code
+(use-package rainbow-mode
+  :diminish rainbow-mode
+  :commands rainbow-mode
+  :preface
+  (defun enable-rainbow-mode ()
+    (when (string-match "\\(color-theme-\\|-theme\\|init\\.el\\)" (buffer-name))
+      (rainbow-mode +1)))
+  :init
+  (add-hook 'emacs-lisp-mode-hook #'enable-rainbow-mode)
+  (dolist (hook '(css-mode-hook html-mode-hook sass-mode-hook))
+    (add-hook hook #'rainbow-mode)))
+
+(use-package rainbow-delimiters
+  :diminish rainbow-delimiters-mode
+  :after cc-mode
+  :init
+  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+
+;; swiper
+(use-package swiper
+  :ensure t
+  :config
+  (global-set-key (kbd "C-s") 'swiper)
+  (setq ivy-display-style 'fancy)
+  :init
+  ;;advise swiper to recenter on exit
+  (defun swiper-recenter (&rest args)
+    "recenter display after swiper"
+    (recenter)
+    )
+  (defadvice swiper-recenter (after swiper)))
+
+;; beacon
+(use-package beacon
+  :diminish beacon-mode
+  :config
+  (setq beacon-push-mark 35)
+  (setq beacon-color "#666600")
+  :init
+  (beacon-mode))
+
+;; syntax check
+(use-package flycheck
+  :diminish flycheck-mode
+  :commands flycheck-mode
+  :config
+  (defalias 'flycheck-show-error-at-point-soon
+    'flycheck-show-error-at-point))
+
+;;; Auto complete (company -> COMPlete ANYthing)
+(use-package company
+  :ensure t
+  :defer t
+  :diminish company-mode
+  :commands company-mode
+  :init
+  (setq company-idle-delay 0)
+  :config
+  (global-company-mode)
+  (define-key company-active-map (kbd "C-n") 'company-select-next)
+  (define-key company-active-map (kbd "C-p") 'company-select-previous)
+  (defadvice company-pseudo-tooltip-unless-just-one-frontend
+    (around only-show-tooltip-when-invoked activate)
+    (when (company-explicit-action-p) ad-do-it))
+  ;; company colors with dark background
+  (require 'color)
+  (let ((bg (face-attribute 'default :background)))
+    (custom-set-faces
+     `(company-tooltip ((t (:inherit default :background ,(color-lighten-name bg 2)))))
+     `(company-scrollbar-bg ((t (:background ,(color-lighten-name bg 10)))))
+     `(company-scrollbar-fg ((t (:background ,(color-lighten-name bg 5)))))
+     `(company-tooltip-selection ((t (:inherit font-lock-function-name-face))))
+     `(company-tooltip-common ((t (:inherit font-lock-constant-face)))))))
+
+;; savehist
+(use-package savehist
+  :init
+  (setq savehist-file (expand-file-name "savehist" my-tmp)
+        history-length 10000
+        history-delete-duplicates t)
+  :config
+  (savehist-mode +1))
+
+(use-package mic-paren
+  :commands paren-activate
+  :config
+  (paren-activate))
+
+;; Projectile
+;; (use-package projectile
+;;   :init
+;;   (setq projectile-completion-system 'ivy)
+;;   :config
+;;   (projectile-global-mode))
+
+;;; git
+;; (use-package magit
+;;   :defer t
+;;   :bind
+;;   ("C-x g" . magit-status)
+;;   ("<f9>"  . magit-blame-mode))
+
+;;; last change
+(use-package goto-last-change
+  :defer t
+  :bind
+  ("C-x ," . goto-last-change))
+
+;;;
+;;; Format code the Juniper way
+;;;
+;; (require 'cc-mode) ;; should not be required
+(c-add-style "juniper"
+             '(
+               (c-basic-offset . 4)
+               (c-comment-only-line-offset . 0)
+               (c-offsets-alist
+                . (
+                   ;; first line of a new statement block
+                   (statement-block-intro . +)
+
+                   ;; First line of a K&R C argument declaration.
+                   (knr-argdecl-intro . +)
+
+                   ;; The brace that opens a substatement block.
+                   (substatement-open . 0)
+
+                   ;; Any non-special C label.
+                   (label . 2)
+
+                   ;; A `case' or `default' label.
+                   (case-label . 0)
+
+                   ;; The first line in a case block that starts with
+                   ;; a brace.
+                   (statement-case-open . +)
+
+                   ;; A continuation of a statement.
+                   (statement-cont . +)
+
+                   ;; The first line after a conditional or loop
+                   ;; construct.
+                   (substatement . +)
+
+                   ;; The first line in an argument list.
+                   (arglist-intro . c-lineup-arglist-intro-after-paren)
+
+                   ;; The solo close paren of an argument list.
+                   (arglist-close . c-lineup-arglist)
+
+                   ;; Brace that opens an in-class inline method.
+                   (inline-open . 0)
+
+                   ;; Open brace of an enum or static array list.
+                   (brace-list-open . 0)))
+
+               (c-special-indent-hook . c-gnu-impose-minimum)
+               (c-block-comment-prefix . "")))
+
+(defun juniper-c-default-style ()
+  "Set the default c-style for Juniper."
+  (interactive)
+  ;; (define-key c-mode-map "\r" 'newline-and-indent)
+
+  (c-set-style "juniper")
+  (c-toggle-hungry-state t)
+  (c-toggle-auto-newline t)
+  (flycheck-mode)
+  (flyspell-prog-mode)
+  (fa-config-default)
+  (highlight-symbol-mode)
+  (diff-hl-mode)
+  ;; (git-gutter-mode)
+  (font-lock-add-keywords nil
+			  '(("\\<\\(FIX\\|FIXME\\|TODO\\|BUG\\|HACK\\):" 1 font-lock-warning-face t)))
+
+  (setq vc-svn-diff-switches '"-u")
+  (define-key c-mode-map "\C-cd" 'vc-diff)
+
+  (setq indent-tabs-mode nil)
+  (setq tab-always-indent 'complete)
+  (electric-indent-mode t)
+  ;; (electric-pair-mode t) ; damn irritating!
+  ;; (add-hook 'before-save-hook 'delete-trailing-whitespace
+  (whitespace-mode)
+  (show-paren-mode t)
+  (setq show-paren-style 'parenthesis)
+
+  (defun toggle-tab-width ()
+    "Toggle the value of tab-width between 4 and 8"
+    (interactive)
+    (if (= tab-width 8)
+        (setq tab-width 4)
+      ((insert )f (= tab-width 4)
+       (setq tab-width 8)))
+    (scroll-up 0))
+
+  (defun toggle-c-offset ()
+    "Toggle the value of c-basic-offset between 4 and 8"
+    (interactive)
+    (if (= c-basic-offset 8)
+        (setq c-basic-offset 4)
+      (if (= c-basic-offset 4)
+          (setq c-basic-offset 8)))
+    (scroll-up 0))
+
+  ;; Complement to next-error
+  (defun previous-error (n)
+    "Visit previous compilation error message and corresponding source code."
+    (interactive "p")
+    (next-error (- n)))
+  (abbrev-mode nil))
+
+(add-hook 'c-mode-common-hook 'juniper-c-default-style)
+(add-hook 'prog-mode-hook '(lambda ()
+                             (font-lock-add-keywords nil
+                                                     '(("\\<\\(FIX\\|FIXME\\|TODO\\|BUG\\|HACK\\):" 1 font-lock-warning-face t)))))
+
+
+;; python
+(add-hook 'python-mode-hook '(lambda ()
+                               (local-set-key (kbd "RET") 'newline-and-indent)
+                               (setq python-indent-offset 4)))
+;; (add-hook 'projectile-mode-hook '(lambda () (diminish 'projectile-mode "P")))
+
+;; Versa XML file settings
+(setq nxml-child-indent 4
+      nxml-attribute-indent 4
+      nxml-slash-auto-complete-flag t)
+
+;; waf
+(setq auto-mode-alist (cons '("wscript" . python-mode) auto-mode-alist))
+
+;; autoload gdb-script-mode while editing .gdb files
+(add-to-list 'auto-mode-alist '("\\.gdb$" . gdb-script-mode))
+
+(use-package highlight-symbol
+  :init
+  (setq highlight-symbol-on-navigation-p t)
+  :config
+  (global-set-key [(control f3)] 'highlight-symbol)
+  (global-set-key [f3] 'highlight-symbol-next)
+  (global-set-key [(shift f3)] 'highlight-symbol-prev)
+  (global-set-key [(meta f3)] 'highlight-symbol-query-replace)
+  :diminish highlight-symbol-mode "")
+
+
+;; Org
+(use-package org
+  :ensure t
+  :bind
+  (("C-c a" . org-agenda))
+  :defer t
+  :config
+  (defadvice org-agenda (around org-agenda-fullscreen activate)
+    (window-configuration-to-register :org-agenda-fullscreen)
+    ad-do-it
+    (delete-other-windows))
+  (defadvice org-agenda-quit (around org-agenda-quit-fullscreen activate)
+    ad-do-it
+    (jump-to-register :org-agenda-fullscreen))
+  (use-package org-capture
+    :ensure nil)
+  ;; Add some new modules.
+  (add-to-list 'org-modules 'org-habit)
+
+  (require 'india-holidays-2016)
+
+  ;; Set up paths.
+  (setq org-agenda-files (list (expand-file-name "work.org" org-directory)
+                               (expand-file-name "birthdays.org" org-directory)
+                               (expand-file-name "anniversaries.org" org-directory)
+                               (expand-file-name "holidays.org" org-directory)
+                               (expand-file-name "personal.org" org-directory)
+                               (expand-file-name "todo.org" org-directory))
+        org-todo-keywords
+        '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+          (sequence "WAITING(w@)" "HOLD(h@)" "|" "CANCELLED(c)"))
+        org-agenda-include-diary nil ;; for time being
+        org-agenda-start-on-weekday nil
+        org-todo-keyword-faces
+        '(("NEXT" :foreground "blue" :weight bold)
+          ("WAITING" :foreground "orange" :weight bold)
+          ("HOLD" :foreground "magenta" :weight bold)
+          ("CANCELLED" :foreground "forest green" :weight bold))
+
+        org-capture-templates
+        (let ((refile-file (expand-file-name "notes.org" org-directory)))
+          `(("t" "todo" entry (file ,refile-file)
+             "* TODO %?")
+            ("n" "note" entry (file ,refile-file)
+             "* %?")))
+
+        ;; Add a timestamp when a certain TODO item was finished.
+        org-log-done 'time
+
+        ;; Custom timestamp formats.
+        org-display-custom-times t
+        org-time-stamp-custom-formats
+        '("<%d-%m-%Y %a>" . "<%d-%m-%Y %a %H:%M>")
+        org-ellipsis "⤵"
+        org-M-RET-my-split-line nil)
+
+  ;; Align org tags before saving.
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook 'org-align-all-tags nil t))))
+
+;; LaTeX export
+(use-package ox-latex
+  :ensure nil
+  :defer t
+  :commands -repeat
+  :config
+  (setq org-latex-pdf-process
+        (-repeat 3 "pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f"))
+  (add-to-list 'org-latex-packages-alist '("" "minted"))
+  (setq org-latex-listings 'minted))
+
+;; Integration with beamer
+(use-package ox-beamer
+  :ensure nil
+  :defer t
+  :config
+  ;; Don't ask me if this variable can be evaluated.
+  (put 'org-beamer-outline-frame-title 'safe-local-variable 'stringp)
+  (add-to-list 'org-beamer-environments-extra
+               '("onlyenv+block"
+                 "O"
+                 "\\begin{onlyenv}%a\\begin{block}{%h}"
+                 "\\end{block}\\end{onlyenv}")))
+
+(use-package org-journal
+  :defer t
+  :mode
+  ("journal/[0-9]\\{8\\}$" . org-journal-mode)
+  :config
+  (setq org-journal-dir (concat org-directory "/journal/")))
+
+(use-package org-bullets
+  :commands org-bullets-mode
+  :preface
+  (defun org-bullets-mode-hook ()
+    (setq org-bullets-bullet-list '("◉" "◎" "⚫" "○" "►" "◇"))
+    (org-bullets-mode +1))
+  :init
+  (add-hook 'org-mode-hook #'org-bullets-mode-hook))
+
+
+;;; Smart mode line
+(use-package smart-mode-line
+  :init
+  (setq sml/no-confirm-load-theme t)
+  :config
+  (sml/setup)
+  (sml/apply-theme 'respectful))
+
+;; Take a break
+(use-package type-break
+  :config
+  (type-break-mode))
+
+;; screens
+(use-package escreen
+  :config
+  (escreen-install)
+  (escreen-number-mode))
+
+;; ibuffer
+(use-package ibuffer
+  :config
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
+  (autoload 'ibuffer "ibuffer" "List buffers." t))
+
+;; semantic
+(use-package semantic
+  :config
+  ;; Increase the delay before activation
+  (setq semantic-idle-scheduler-idle-time 30)
+  ;; Don't reparse really big buffers.
+  (setq semantic-idle-scheduler-max-buffer-size 100000)
+  ;; Increase the delay before doing slow work to 2 minutes.
+  (setq semantic-idle-scheduler-work-idle-time 120))
+
+
+
+;; Mail
+(require 'notmuch-config)
+
+;;; ;; Sysmon
+;; (use-package symon
+;;  :init
+;;  (setq symon-delay 300)
+;;  :config
+;;  (symon-mode))
+
+;; deft
+(use-package deft
+  :bind
+  (("C-c d" . deft-find-file)
+   ("<f8>"  . deft))
+  :init
+  (setq deft-extensions '("txt" "tex" "org")
+        deft-directory "~/Dropbox/Deft/notes/"
+        deft-archive-directory "~/Dropbox/Deft/archives/"))
+
+;; keyfreq
+(use-package keyfreq
+  :config
+  (setq keyfreq-excluded-commands
+        '(self-insert-command
+          abort-recursive-edit
+	  forward-char
+	  backward-char
+	  delete-backward-char
+	  delete-char
+          previous-line
+          next-line
+	  save-buffer
+	  fill-paragraph
+	  kill-line
+	  move-beginning-of-line
+	  move-end-of-line))
+  :init
+  (keyfreq-mode 1)
+  (keyfreq-autosave-mode 1))
+
+
+;;; key bindings
+
+(bind-key "C-x m" #'eshell)
+(bind-key "C-x r" #'revert-buffer)
+
+;; news
+(use-package newsticker
+  :bind
+  (("C-c c n" . newsticker-stop-ticker))
+  :init
+  (setq newsticker-dir (expand-file-name "news" my-tmp)
+        newsticker-url-list
+        '(("Google News" "http://news.google.com/?hl=en&output=rss" nil 60 nil) ;; label, url, start-time, interval, wget-args
+          ("Google India" "http://news.google.com/?hl=en&ned=in&output=rss" nil 60 nil))
+        newsticker-retrieval-method 'external
+        newsticker-wget-arguments '("-q" "-O" "-" "--user-agent" "testing"))
+  :config
+  (newsticker-start)
+  (run-with-idle-timer 120 t '(lambda()
+                                (newsticker-start-ticker))))
+                       ;;         (add-hook 'pre-command-hook 'newsticker-stop-ticker))))
+
+
+;;; registers
+(set-register ?i `(file . ,(concat user-emacs-directory "init.el")))
+
+;;; Elapsed time
+(add-hook 'after-init-hook
+          `(lambda ()
+             (let ((elapsed (float-time (time-subtract (current-time)
+                                                       start-time))))
+               (message "Loading %s...done (%.3fs) [after-init-]"
+                        ,load-file-name elapsed))
+	     (org-agenda nil "a")) t)
+
+(provide 'init)
+;;; init.el ends here
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(org-agenda-files (quote ("/home/ck/.emacs.d/org/birthdays.org" "/home/ck/.emacs.d/org/anniversaries.org" "/home/ck/.emacs.d/org/holidays.org" "/home/ck/.emacs.d/org/personal.org" "/home/ck/.emacs.d/org/todo.org"))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

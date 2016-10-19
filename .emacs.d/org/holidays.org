@@ -1,0 +1,3 @@
+* Holidays
+#+CATEGORY: Holiday
+%%(org-calendar-holiday)

@@ -1,0 +1,5 @@
+#+CATEGORY: TODO
+* Send maintenance dues
+  <2016-09-01 +30d>
+* Send reminder for expense reports
+  <2016-08-30 +30d>

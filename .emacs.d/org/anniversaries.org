@@ -1,0 +1,3 @@
+#+CATEGORY: Anniversary
+* Anniversary
+%%(org-anniversary 20 04 2008) Soumia & Chirag, %d years

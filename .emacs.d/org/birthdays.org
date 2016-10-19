@@ -1,0 +1,6 @@
+#+CATEGORY: Birthday
+* Birthday
+%%(org-anniversary 2001 06 05) Earth Day, %d y.o.
+%%(org-anniversary 2011 05 14) Siddhu, %d y.o.
+%%(org-anniversary 1979 12 04) Soumia, %d y.o.
+%%(org-anniversary 1976 12 01) Chirag, %d y.o.
